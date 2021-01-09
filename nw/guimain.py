@@ -346,7 +346,7 @@ class GuiMain(QMainWindow):
                 return False
 
         if self.docEditor.docChanged:
-            self.saveDocument()
+            self.saveDocument(autoSave=True)
 
         if self.theProject.projAltered:
             saveOK   = self.saveProject()
@@ -596,7 +596,7 @@ class GuiMain(QMainWindow):
                 tHandle = self.docEditor.theHandle
 
             if tHandle is not None:
-                self.saveDocument()
+                self.saveDocument(autoSave=True)
             else:
                 logger.verbose("Trying selected document")
                 tHandle = self.treeView.getSelectedHandle()
@@ -897,7 +897,7 @@ class GuiMain(QMainWindow):
             logger.debug("Applying new preferences")
             self.initMain()
             self.theTheme.updateTheme()
-            self.saveDocument()
+            self.saveDocument(autoSave=True)
             self.docEditor.initEditor()
             self.docViewer.initViewer()
             self.treeView.initTree()

@@ -105,9 +105,23 @@ class NWDoc():
             return None
 
         docFile = self._docHandle+".nwd"
-        logger.debug("Opening document %s" % docFile)
-
+        tmpFile = self._docHandle+".nwd~"
         docPath = os.path.join(self.theProject.projContent, docFile)
+        tmpPath = os.path.join(self.theProject.projContent, tmpFile)
+
+        if os.path.isfile(tmpPath):
+            openTemp = self.theParent.askQuestion("Open Auto-Save?", (
+                "An auto-saved version of this document exists. "
+                "Do you want to open this version instead?"
+            ))
+            if openTemp:
+                bakFile = self._docHandle+".bak"
+                bakPath = os.path.join(self.theProject.projContent, bakFile)
+                if os.path.isfile(docPath):
+                    os.rename(docPath, bakPath)
+                os.rename(tmpFile, docPath)
+
+        logger.debug("Opening document %s" % docFile)
         self._fileLoc = docPath
 
         theText = ""
