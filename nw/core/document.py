@@ -67,6 +67,21 @@ class NWDoc():
         self._docMeta   = {}
         return
 
+    def clearDocumentAutoSave(self):
+        """Clear the auto-save file for the current document, if the
+        file exists.
+        """
+        if not isHandle(self._docHandle):
+            return False
+
+        docFile = self._docHandle+".nwd~"
+        docPath = os.path.join(self.theProject.projContent, docFile)
+        if os.path.isfile(docPath):
+            os.unlink(docPath)
+            return True
+
+        return False
+
     def openDocument(self, tHandle, showStatus=True, isOrphan=False):
         """Open a document from handle, capturing potential file system
         errors and parse meta data. If the document doesn't exist on

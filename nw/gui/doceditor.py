@@ -163,6 +163,9 @@ class GuiDocEditor(QTextEdit):
         """Clear the current document and reset all document related
         flags and counters.
         """
+        if self.mainConf.askOnDocSave:
+            self.nwDocument.clearDocumentAutoSave()
+
         self.nwDocument.clearDocument()
         self.setReadOnly(True)
         self.clear()
@@ -400,7 +403,9 @@ class GuiDocEditor(QTextEdit):
 
         self.saveCursorPosition()
         self.nwDocument.saveDocument(docText, autoSave=autoSave)
-        self.setDocumentChanged(False, autoSave=autoSave)
+
+        if not (self.mainConf.askOnDocSave and autoSave):
+            self.setDocumentChanged(False, autoSave=autoSave)
 
         self.theParent.theIndex.scanText(theItem.itemHandle, docText)
 
@@ -485,12 +490,7 @@ class GuiDocEditor(QTextEdit):
         status depending on user preferences.
         """
         self.docChanged = bValue
-        if self.mainConf.askOnDocSave:
-            if not autoSave:
-                self.theParent.statusBar.setDocumentStatus(self.docChanged)
-        else:
-            self.theParent.statusBar.setDocumentStatus(self.docChanged)
-
+        self.theParent.statusBar.setDocumentStatus(self.docChanged)
         return self.docChanged
 
     def getText(self):

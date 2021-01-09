@@ -503,7 +503,16 @@ class GuiMain(QMainWindow):
 
         self.docEditor.saveCursorPosition()
         if self.docEditor.docChanged:
-            self.saveDocument()
+            if self.mainConf.askOnDocSave:
+                doSave = self.askQuestion(
+                    "Save Document?", "Save changes to the current document?"
+                )
+            else:
+                doSave = True
+
+            if doSave:
+                self.saveDocument()
+
         self.docEditor.clearEditor()
 
         return True
