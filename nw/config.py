@@ -146,6 +146,8 @@ class Config:
         self.highlightQuotes = True  # Highlight text in quotes
         self.highlightEmph   = True  # Add colour to text emphasis
 
+        self.askOnDocSave    = False # Allow closing a document without saving it
+
         ## User-Selected Symbols
         self.fmtApostrophe   = nwUnicode.U_RSQUO
         self.fmtSingleQuotes = [nwUnicode.U_LSQUO, nwUnicode.U_RSQUO]
@@ -519,6 +521,9 @@ class Config:
         self.highlightEmph = self._parseLine(
             cnfParse, cnfSec, "highlightemph", self.CNF_BOOL, self.highlightEmph
         )
+        self.askOnDocSave = self._parseLine(
+            cnfParse, cnfSec, "askondocsave", self.CNF_BOOL, self.askOnDocSave
+        )
 
         ## Backup
         cnfSec = "Backup"
@@ -648,6 +653,7 @@ class Config:
         cnfParse.set(cnfSec, "showfullpath",    str(self.showFullPath))
         cnfParse.set(cnfSec, "highlightquotes", str(self.highlightQuotes))
         cnfParse.set(cnfSec, "highlightemph",   str(self.highlightEmph))
+        cnfParse.set(cnfSec, "askondocsave",    str(self.askOnDocSave))
 
         ## Backup
         cnfSec = "Backup"
@@ -977,7 +983,8 @@ class Config:
         return checkVal
 
     def _checkOptionalPackages(self):
-        """Cheks if we have the optional packages used by some features.
+        """Checks if we have the optional packages used by some
+        features.
         """
         try:
             import enchant # noqa: F401
