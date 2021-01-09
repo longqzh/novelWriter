@@ -553,14 +553,14 @@ class GuiMain(QMainWindow):
 
         return False
 
-    def saveDocument(self):
+    def saveDocument(self, autoSave=False):
         """Save the current documents.
         """
         if not self.hasProject:
             logger.error("No project open")
             return False
 
-        self.docEditor.saveText()
+        self.docEditor.saveText(autoSave=autoSave)
 
         return True
 
@@ -1241,7 +1241,7 @@ class GuiMain(QMainWindow):
         """
         if self.hasProject and self.docEditor.docChanged:
             logger.debug("Autosaving document")
-            self.saveDocument()
+            self.saveDocument(autoSave=True)
         return
 
     def _makeStatusIcons(self):

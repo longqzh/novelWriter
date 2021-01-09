@@ -25,6 +25,7 @@
  along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import nw
 import logging
 import os
 
@@ -40,6 +41,7 @@ class NWDoc():
 
         self.theProject = theProject
         self.theParent  = theParent
+        self.mainConf   = nw.CONFIG
 
         # Internal Variables
         self._theItem   = None # The currently open item
@@ -129,7 +131,7 @@ class NWDoc():
 
         return theText
 
-    def saveDocument(self, docText):
+    def saveDocument(self, docText, autoSave=False):
         """Save the document. The file is saved via a temp file in case
         of save failure. Returns True if successful, False if not.
         """
@@ -162,8 +164,13 @@ class NWDoc():
             self.makeAlert(["Could not save document.", str(e)], nwAlert.ERROR)
             return False
 
-        # If we're here, the file was successfully saved, so we can
-        # replace the temp file with the actual file
+        if self.mainConf.askOnDocSave and autoSave:
+            # Return here if we're auto-saving and are not automatically
+            # overwriting the old document file.
+            return True
+
+        # If we're still here, the file was successfully saved, and
+        # we're allowed to replace the temp file with the actual file.
         if os.path.isfile(docPath):
             os.unlink(docPath)
         os.rename(docTemp, docPath)

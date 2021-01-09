@@ -379,7 +379,7 @@ class GuiDocEditor(QTextEdit):
 
         return True
 
-    def saveText(self):
+    def saveText(self, autoSave=False):
         """Save the text currently in the editor to the NWDoc object,
         and update the NWItem meta data.
         """
@@ -397,8 +397,8 @@ class GuiDocEditor(QTextEdit):
         theItem.setParaCount(self.paraCount)
 
         self.saveCursorPosition()
-        self.nwDocument.saveDocument(docText)
-        self.setDocumentChanged(False)
+        self.nwDocument.saveDocument(docText, autoSave=autoSave)
+        self.setDocumentChanged(False, autoSave=autoSave)
 
         self.theParent.theIndex.scanText(theItem.itemHandle, docText)
 
@@ -471,13 +471,18 @@ class GuiDocEditor(QTextEdit):
     #  Setters and Getters
     ##
 
-    def setDocumentChanged(self, bValue):
+    def setDocumentChanged(self, bValue, autoSave=False):
         """Keeps track of the document changed variable, and ensures
         that the corresponding icon on the status bar shows the same
-        status.
+        status depending on user preferences.
         """
         self.docChanged = bValue
-        self.theParent.statusBar.setDocumentStatus(self.docChanged)
+        if self.mainConf.askOnDocSave:
+            if not autoSave:
+                self.theParent.statusBar.setDocumentStatus(self.docChanged)
+        else:
+            self.theParent.statusBar.setDocumentStatus(self.docChanged)
+
         return self.docChanged
 
     def getText(self):
