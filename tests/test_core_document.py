@@ -5,6 +5,7 @@
 import os
 import pytest
 
+from tools import readFile
 from dummy import causeOSError
 
 from nw.core import NWProject, NWDoc
@@ -97,6 +98,25 @@ def testCoreDocument_LoadSave(monkeypatch, dummyGUI, nwMinimal):
     # Make the delete pass
     assert theDoc.deleteDocument(xHandle)
     assert not os.path.isfile(docPath)
+
+    # Clear auto-save
+    theDoc.clearDocument()
+    assert not theDoc.clearDocumentAutoSave()
+    assert theDoc.openDocument(sHandle) == "### New Scene\n\n"
+    theDoc.mainConf.askOnDocSave = True
+    assert theDoc.saveDocument("### My Scene\n\n", autoSave=True)
+
+    docFile = os.path.join(nwMinimal, "content", sHandle+".nwd")
+    tmpFile = os.path.join(nwMinimal, "content", sHandle+".nwd~")
+    assert os.path.isfile(docFile)
+    assert os.path.isfile(tmpFile)
+    assert "### New Scene" in readFile(docFile)
+    assert "### My Scene" in readFile(tmpFile)
+
+    assert theDoc.clearDocumentAutoSave()
+    assert not theDoc.clearDocumentAutoSave()
+    assert os.path.isfile(docFile)
+    assert not os.path.isfile(tmpFile)
 
 # END Test testCoreDocument_Load
 
