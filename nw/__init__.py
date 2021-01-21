@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import QApplication, QErrorMessage
 
 from nw.error import exceptionHandler
 from nw.config import Config
-
+ \
 #
 #  Version Scheme
 # ================
@@ -54,7 +54,7 @@ from nw.config import Config
 #  0x010200c1 : 1.2-rc1     1.2rc1     First release candidate
 #  0x010200f0 : 1.2         1.2        Final release
 #  0x010200f1 : 1.2-post1   1.2.post1  Post release, but not a code patch!
-#  0x010201f0 : 1.2.1       1.2.1      Patch release
+#  0x010201f0 : 1.2.1       1.2.1      Patch release 
 #
 
 __package__    = "nw"
