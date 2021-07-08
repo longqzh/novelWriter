@@ -73,7 +73,7 @@ class NWDoc():
             return None
 
         docFile = self._docHandle+".nwd"
-        logger.debug("Opening document %s" % docFile)
+        logger.debug("Opening document: %s", docFile)
 
         docPath = os.path.join(self.theProject.projContent, docFile)
         self._fileLoc = docPath
@@ -82,7 +82,7 @@ class NWDoc():
         self._docMeta = {}
         if os.path.isfile(docPath):
             try:
-                with open(docPath, mode="r", encoding="utf8") as inFile:
+                with open(docPath, mode="r", encoding="utf-8") as inFile:
 
                     # Check the first <= 10 lines for metadata
                     for i in range(10):
@@ -120,7 +120,7 @@ class NWDoc():
         self.theProject.ensureFolderStructure()
 
         docFile = self._docHandle+".nwd"
-        logger.debug("Saving document %s" % docFile)
+        logger.debug("Saving document: %s", docFile)
 
         docPath = os.path.join(self.theProject.projContent, docFile)
         docTemp = os.path.join(self.theProject.projContent, docFile+"~")
@@ -136,7 +136,7 @@ class NWDoc():
             )
 
         try:
-            with open(docTemp, mode="w", encoding="utf8") as outFile:
+            with open(docTemp, mode="w", encoding="utf-8") as outFile:
                 outFile.write(docMeta)
                 outFile.write(docText)
         except Exception as e:
@@ -170,7 +170,7 @@ class NWDoc():
             if os.path.isfile(chkFile):
                 try:
                     os.unlink(chkFile)
-                    logger.debug("Deleted: %s" % chkFile)
+                    logger.debug("Deleted: %s", chkFile)
                 except Exception as e:
                     self._docError = str(e)
                     return False
@@ -237,7 +237,7 @@ class NWDoc():
                     self._docMeta["layout"] = nwItemLayout[metaBits[1]]
 
         else:
-            logger.debug("Ignoring meta data: '%s'" % metaLine.strip())
+            logger.debug("Ignoring meta data: '%s'", metaLine.strip())
 
         return
 
