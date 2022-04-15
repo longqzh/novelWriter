@@ -3,7 +3,7 @@ novelWriter – Test Suite Configuration
 ======================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,19 +19,28 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
+import os
 import sys
 import pytest
 import shutil
-import os
 
 from mock import MockGuiMain
 from tools import cleanProject
 
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-import nw  # noqa: E402
+import novelwriter  # noqa: E402
 
-from nw.config import Config  # noqa: E402
+from PyQt5.QtWidgets import QMessageBox  # noqa: E402
+
+from novelwriter.config import Config  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def initQt(qtbot):
+    """Ensures that the qt main thread is always available in all tests.
+    """
+    return
 
 
 ##
@@ -143,7 +152,7 @@ def fncConf(fncDir):
 def mockGUI(monkeypatch, tmpConf):
     """Create a mock instance of novelWriter's main GUI class.
     """
-    monkeypatch.setattr("nw.CONFIG", tmpConf)
+    monkeypatch.setattr("novelwriter.CONFIG", tmpConf)
     theGui = MockGuiMain()
     theGui.mainConf = tmpConf
     return theGui
@@ -153,11 +162,11 @@ def mockGUI(monkeypatch, tmpConf):
 def nwGUI(qtbot, monkeypatch, fncDir, fncConf):
     """Create an instance of the novelWriter GUI.
     """
-    monkeypatch.setattr("nw.CONFIG", fncConf)
-    nwGUI = nw.main(["--testmode", "--config=%s" % fncDir, "--data=%s" % fncDir])
+    monkeypatch.setattr(QMessageBox, "warning", lambda *a: QMessageBox.Yes)
+    monkeypatch.setattr("novelwriter.CONFIG", fncConf)
+    nwGUI = novelwriter.main(["--testmode", "--config=%s" % fncDir, "--data=%s" % fncDir])
     qtbot.addWidget(nwGUI)
     nwGUI.show()
-    qtbot.waitForWindowShown(nwGUI)
     qtbot.wait(20)
 
     nwGUI.mainConf.lastPath = fncDir

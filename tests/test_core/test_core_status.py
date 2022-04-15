@@ -3,7 +3,7 @@ novelWriter – NWStatus Class Tester
 ===================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,7 +23,9 @@ import pytest
 
 from lxml import etree
 
-from nw.core.status import NWStatus
+from PyQt5.QtGui import QIcon
+
+from novelwriter.core.status import NWStatus
 
 
 @pytest.mark.core
@@ -48,15 +50,19 @@ def testCoreStatus_Entries():
     assert theStatus._theLength == 4
 
     # Lookups
-    assert theStatus.lookupEntry(None) is None
-    assert theStatus.lookupEntry("stuff") is None
-    assert theStatus.lookupEntry("Main") == 3
+    assert theStatus._getIndex(None) is None
+    assert theStatus._getIndex("stuff") is None
+    assert theStatus._getIndex("Main") == 3
 
     # Checks
     assert theStatus.checkEntry(123) == "New"
     assert theStatus.checkEntry("Stuff") == "New"
     assert theStatus.checkEntry("New ") == "New"
     assert theStatus.checkEntry("  Main ") == "Main"
+
+    # Icons
+    assert isinstance(theStatus.getIcon("Stuff"), QIcon)
+    assert isinstance(theStatus.getIcon("New"), QIcon)
 
     # Set new list
     newList = [
@@ -87,12 +93,17 @@ def testCoreStatus_Entries():
     assert theStatus._theCounts == countTo
 
     # Iterate
-    for i, (sA, sB, sC) in enumerate(theStatus):
+    for i, (sA, sB, sC, sD) in enumerate(theStatus):
         assert sA == theStatus._theLabels[i]
         assert sB == theStatus._theColours[i]
         assert sC == theStatus._theCounts[i]
+        assert sD == theStatus._theIcons[i]
 
-    assert theStatus[9] == (None, None, None)
+    sA, sB, sC, sD = theStatus[9]
+    assert sA is None
+    assert sB is None
+    assert sC is None
+    assert isinstance(sD, QIcon)
 
     # Clear counts
     theStatus.resetCounts()
@@ -122,12 +133,12 @@ def testCoreStatus_XMLPackUnpack():
     xStatus = etree.SubElement(nwXML, "status")
     theStatus.packXML(xStatus)
     assert etree.tostring(xStatus, pretty_print=False, encoding="utf-8") == (
-        b"<status>"
-        b"<entry blue=\"100\" green=\"100\" red=\"100\">New</entry>"
-        b"<entry blue=\"0\" green=\"50\" red=\"200\">Minor</entry>"
-        b"<entry blue=\"0\" green=\"150\" red=\"200\">Major</entry>"
-        b"<entry blue=\"0\" green=\"200\" red=\"50\">Main</entry>"
-        b"</status>"
+        b'<status>'
+        b'<entry red="100" green="100" blue="100">New</entry>'
+        b'<entry red="200" green="50" blue="0">Minor</entry>'
+        b'<entry red="200" green="150" blue="0">Major</entry>'
+        b'<entry red="50" green="200" blue="0">Main</entry>'
+        b'</status>'
     )
 
     # Unpack

@@ -1,22 +1,25 @@
 # Setup/Install
 /MANIFEST
-/dist/
 /build/
 /deploy/
+/dist/
+/dist_*/
 *.spec
 *.egg-info
 setup.iss
-novelwriter.desktop
-novelWriter.pyw
+/novelwriter.desktop
+/novelWriter.pyw
 
 # Translations
-/nw/assets/i18n/*.qm
+/novelwriter/assets/i18n/*.qm
 .qmake.stash
 i18n/*.qm
 i18n/*.qph
 
 # Documentation
 /docs/build/
+/novelwriter/assets/help/
+/novelwriter/assets/manual.pdf
 *.qch
 *.qhc
 
@@ -25,7 +28,7 @@ __pycache__
 *.pyc
 
 # Sample Project
-/nw/assets/sample.zip
+/novelwriter/assets/sample.zip
 /sample/cache
 /sample/meta
 /sample/versions

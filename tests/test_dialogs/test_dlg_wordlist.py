@@ -3,7 +3,7 @@ novelWriter – Other Dialog Classes Tester
 =========================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ from PyQt5.QtWidgets import QDialog, QMessageBox, QAction
 from tools import writeFile, readFile, getGuiItem
 from mock import causeOSError
 
-from nw.dialogs import GuiWordList
-from nw.constants import nwFiles
+from novelwriter.dialogs import GuiWordList
+from novelwriter.constants import nwFiles
 
 keyDelay = 2
 typeDelay = 1

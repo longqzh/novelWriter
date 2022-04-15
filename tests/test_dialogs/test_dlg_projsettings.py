@@ -3,7 +3,7 @@ novelWriter – Project Settings Dialog Class Tester
 ==================================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ from PyQt5.QtWidgets import (
     QDialog, QAction, QMessageBox, QColorDialog, QTreeWidgetItem
 )
 
-from nw.dialogs import GuiProjectSettings
+from novelwriter.dialogs import GuiProjectSettings
 
 keyDelay = 2
 typeDelay = 1
@@ -66,6 +66,8 @@ def testDlgProjSettings_Dialog(qtbot, monkeypatch, nwGUI, fncDir, fncProj, outDi
     # Get the dialog object
     monkeypatch.setattr(GuiProjectSettings, "exec_", lambda *a: None)
     monkeypatch.setattr(GuiProjectSettings, "result", lambda *a: QDialog.Accepted)
+    monkeypatch.setattr(nwGUI.docEditor.spEnchant, "listDictionaries", lambda: [("en", "none")])
+
     nwGUI.mainMenu.aProjectSettings.activate(QAction.Trigger)
     qtbot.waitUntil(lambda: getGuiItem("GuiProjectSettings") is not None, timeout=1000)
 

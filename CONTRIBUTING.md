@@ -9,8 +9,7 @@ The following contributions are welcome:
 
 * Bugfixes for new or existing bugs. Please also report new bugs in the issue tracker even if you
   also provide a fix. It makes it easier to keep track of what has been fixed and when.
-* New translations. You can read more about contributing translations
-  [here](https://github.com/vkbo/novelWriter/blob/main/i18n/README.md).
+* Translations via the [crowdin project page](https://crowdin.com/project/novelwriter).
 * Improvements to the documentation. Particularly if the documentation is unclear. Please don't
   make any larger changes to the documentation without discussing if with the maintainer first.
 * Adaptations, installation or packaging features targeting specific operating systems.
@@ -76,13 +75,13 @@ style guide, but with a few exceptions. Some key points are listed below.
 **Variable and Function Names**
 
 * PEP8 allows for camelCase for consistency with existing code. The Qt library uses camelCase, so
-  the Python the source code does too.
+  the Python source code does too.
 * The exception to the above is for constants. They should always be in upper snake case, like PEP8
   states.
 
 **Spaces, Indentation and Alignment**
 
-* Only indentation by 4 spaces is allowed.
+* Only indentation by multiples of 4 spaces is allowed.
 * No trailing spaces should occur on any line in the source code, including empty lines.
 * Ideally, a function should end on the same indention level as it started. Exceptions are allowed
   if it makes the code easier to follow.

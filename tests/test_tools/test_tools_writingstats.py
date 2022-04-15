@@ -3,7 +3,7 @@ novelWriter – Writing Stats Dialog Class Tester
 ===============================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ from mock import causeOSError
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QAction, QFileDialog, QMessageBox
 
-from nw.tools import GuiWritingStats
-from nw.constants import nwFiles
+from novelwriter.tools import GuiWritingStats
+from novelwriter.constants import nwFiles
 
 keyDelay = 2
 typeDelay = 1

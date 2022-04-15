@@ -3,7 +3,7 @@ novelWriter – Config Class Tester
 =================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ from shutil import copyfile
 from mock import causeOSError, MockApp
 from tools import cmpFiles, writeFile
 
-from nw.config import Config
-from nw.constants import nwConst, nwFiles
+from novelwriter.config import Config
+from novelwriter.constants import nwFiles
 
 
 @pytest.mark.base
@@ -126,21 +126,20 @@ def testBaseConfig_Init(monkeypatch, tmpDir, fncDir, outDir, refDir, filesDir):
 
     # Test load/save with no path
     tstConf.confPath = None
-    assert not tstConf.loadConfig()
-    assert not tstConf.saveConfig()
+    assert tstConf.loadConfig() is False
+    assert tstConf.saveConfig() is False
 
     # Run again and set the paths directly and correctly
     # This should create a config file as well
     with monkeypatch.context() as mp:
         mp.setattr("os.path.expanduser", lambda *a: "")
-        tstConf.spellTool = nwConst.SP_INTERNAL
         tstConf.initConfig(confPath=tmpDir, dataPath=tmpDir)
         assert tstConf.confPath == tmpDir
         assert tstConf.dataPath == tmpDir
         assert os.path.isfile(confFile)
 
         copyfile(confFile, testFile)
-        assert cmpFiles(testFile, compFile, [2, 9, 10])
+        assert cmpFiles(testFile, compFile, ignoreStart=("timestamp", "lastnotes", "guilang"))
 
     # Load and save with OSError
     with monkeypatch.context() as mp:
@@ -174,8 +173,8 @@ def testBaseConfig_Init(monkeypatch, tmpDir, fncDir, outDir, refDir, filesDir):
         assert tstConf.appRoot == os.path.dirname(appRoot)
         assert tstConf.appPath == os.path.dirname(appRoot)
 
-    assert tstConf.loadConfig()
-    assert tstConf.saveConfig()
+    assert tstConf.loadConfig() is True
+    assert tstConf.saveConfig() is True
 
     # Test Correcting Quote Settings
     origDbl = tstConf.fmtDoubleQuotes
@@ -187,16 +186,42 @@ def testBaseConfig_Init(monkeypatch, tmpDir, fncDir, outDir, refDir, filesDir):
     tstConf.fmtSingleQuotes = ["'", "'"]
     tstConf.doReplaceDQuote = True
     tstConf.doReplaceSQuote = True
-    assert tstConf.saveConfig()
+    assert tstConf.saveConfig() is True
 
-    assert tstConf.loadConfig()
-    assert not tstConf.doReplaceDQuote
-    assert not tstConf.doReplaceSQuote
+    assert tstConf.loadConfig() is True
+    assert tstConf.doReplaceDQuote is False
+    assert tstConf.doReplaceSQuote is False
 
     tstConf.fmtDoubleQuotes = origDbl
     tstConf.fmtSingleQuotes = origSng
     tstConf.doReplaceDQuote = orDoDbl
     tstConf.doReplaceSQuote = orDoSng
+    assert tstConf.saveConfig() is True
+
+    # Test Correcting icon theme
+    origIcons = tstConf.guiIcons
+
+    tstConf.guiIcons = "typicons_colour_dark"
+    assert tstConf.saveConfig() is True
+    assert tstConf.loadConfig() is True
+    assert tstConf.guiIcons == "typicons_dark"
+
+    tstConf.guiIcons = "typicons_grey_dark"
+    assert tstConf.saveConfig() is True
+    assert tstConf.loadConfig() is True
+    assert tstConf.guiIcons == "typicons_dark"
+
+    tstConf.guiIcons = "typicons_colour_light"
+    assert tstConf.saveConfig() is True
+    assert tstConf.loadConfig() is True
+    assert tstConf.guiIcons == "typicons_light"
+
+    tstConf.guiIcons = "typicons_grey_light"
+    assert tstConf.saveConfig() is True
+    assert tstConf.loadConfig() is True
+    assert tstConf.guiIcons == "typicons_light"
+
+    tstConf.guiIcons = origIcons
     assert tstConf.saveConfig()
 
     # Localisation
@@ -218,7 +243,7 @@ def testBaseConfig_Init(monkeypatch, tmpDir, fncDir, outDir, refDir, filesDir):
     theList = tstConf.listLanguages(tstConf.LANG_NW)
     assert theList == [("en_GB", "British English")]
     theList = tstConf.listLanguages(tstConf.LANG_PROJ)
-    assert theList == [("en", "English")]
+    assert theList == [("en_GB", "British English")]
     theList = tstConf.listLanguages(None)
     assert theList == []
 
@@ -230,7 +255,7 @@ def testBaseConfig_Init(monkeypatch, tmpDir, fncDir, outDir, refDir, filesDir):
     assert theList == [("en_GB", "British English"), ("fr", "Français")]
 
     copyfile(confFile, testFile)
-    assert cmpFiles(testFile, compFile, [2, 9, 10])
+    assert cmpFiles(testFile, compFile, ignoreStart=("timestamp", "lastnotes", "guilang"))
 
 # END Test testBaseConfig_Init
 
@@ -480,41 +505,41 @@ def testBaseConfig_SettersGetters(tmpConf, tmpDir, outDir, refDir):
     # ============
 
     tmpConf.guiScale = 1.0
-    assert tmpConf.getTextWidth() == 600
+    assert tmpConf.getTextWidth(False) == 600
+    assert tmpConf.getTextWidth(True) == 800
     assert tmpConf.getTextMargin() == 40
     assert tmpConf.getTabWidth() == 40
-    assert tmpConf.getFocusWidth() == 800
 
     tmpConf.guiScale = 2.0
-    assert tmpConf.getTextWidth() == 1200
+    assert tmpConf.getTextWidth(False) == 1200
+    assert tmpConf.getTextWidth(True) == 1600
     assert tmpConf.getTextMargin() == 80
     assert tmpConf.getTabWidth() == 80
-    assert tmpConf.getFocusWidth() == 1600
 
     # Flag Setters
     # ============
 
-    assert not tmpConf.setShowRefPanel(False)
-    assert not tmpConf.showRefPanel
-    assert tmpConf.setShowRefPanel(True)
+    assert tmpConf.setShowRefPanel(False) is False
+    assert tmpConf.showRefPanel is False
+    assert tmpConf.setShowRefPanel(True) is True
 
-    assert not tmpConf.setViewComments(False)
-    assert not tmpConf.viewComments
-    assert tmpConf.setViewComments(True)
+    assert tmpConf.setViewComments(False) is False
+    assert tmpConf.viewComments is False
+    assert tmpConf.setViewComments(True) is True
 
-    assert not tmpConf.setViewSynopsis(False)
-    assert not tmpConf.viewSynopsis
-    assert tmpConf.setViewSynopsis(True)
+    assert tmpConf.setViewSynopsis(False) is False
+    assert tmpConf.viewSynopsis is False
+    assert tmpConf.setViewSynopsis(True) is True
 
     # Check Final File
     # ================
 
-    assert tmpConf.confChanged
-    assert tmpConf.saveConfig()
-    assert not tmpConf.confChanged
+    assert tmpConf.confChanged is True
+    assert tmpConf.saveConfig() is True
+    assert tmpConf.confChanged is False
 
     copyfile(confFile, testFile)
-    assert cmpFiles(testFile, compFile, [2, 9, 10])
+    assert cmpFiles(testFile, compFile, ignoreStart=("timestamp", "lastnotes", "guilang"))
 
 # END Test testBaseConfig_SettersGetters
 
@@ -543,15 +568,5 @@ def testBaseConfig_Internal(monkeypatch, tmpConf):
         mp.setitem(sys.modules, "enchant", None)
         tmpConf._checkOptionalPackages()
         assert tmpConf.hasEnchant is False
-
-    with monkeypatch.context() as mp:
-        mp.setattr("shutil.which", lambda *a: "stuff")
-        tmpConf._checkOptionalPackages()
-        assert tmpConf.hasAssistant is True
-
-    with monkeypatch.context() as mp:
-        mp.setattr("shutil.which", lambda *a: None)
-        tmpConf._checkOptionalPackages()
-        assert tmpConf.hasAssistant is False
 
 # END Test testBaseConfig_Internal

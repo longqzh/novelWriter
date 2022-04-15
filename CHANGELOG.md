@@ -1,5 +1,683 @@
 # novelWriter Changelog
 
+## Version 1.6.2 [2022-03-20]
+
+### Release Notes
+
+This is a bugfix release that fixes a couple of minor issues. Projects containing one or more empty
+documents would trigger a rebuild of the index each time the project was opened. This has now been
+fixed. Another fix resolves an error message being written to the console logging output when a new
+document was created. Both errors were harmless.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* Fixed an issue where projects containing empty documents would trigger an index rebuild on open,
+  but the empty document would be skipped due to a check that skips empty documents. As a
+  consequence, the index would be rebuilt each time the project was opened. Empty documents are now
+  added to the index, resolving this issue. Issue #1020. PR #1022.
+* Fixed an issue where the shasum calculation would be performed when a new document was created,
+  which would fail as the file did not yet exist. The error was handled, but an error message was
+  printed to the console log. The shasum is now no longer called if the file doesn't already exist.
+  Issue #1021. PR #1023.
+
+----
+
+## Version 1.6.1 [2022-03-16]
+
+### Release Notes
+
+This is a bugfix and patch release that fixes two recursion/loop issues. One would potentially
+cause a crash if the window was resized rapidly, and one would cause a hang with certain search
+parameters in the editor's search box. The Latin American Spanish translation has also been
+updated.
+
+### Detailed Changelog
+
+**Installation**
+
+* When using the new installer on Windows, the project file mime type icon path would not be
+  correctly configured in registry. The correct path is now used. PR #1006.
+
+**Internationalisation**
+
+* The Latin American Spanish translation has been updated with two missing translation strings.
+  PR #1017.
+
+**Bugfixes**
+
+* Fix a bug where rapidly resizing the main window could trigger the recursion detector in Python
+  if done on a slower system. The actual issue may be a race condition or similar, and the change
+  made at least makes it harder to trigger. PR #1007.
+* With some document searches, it was possible to trigger an infinite loop in the function that
+  counts results. It seems to be caused by the QTextEdit widget's find function returning a
+  successful result status, but no actual result selection. The fix will now write a warning to the
+  log and exit in such cases. The number of results is also now capped at 1000. Issue #1015.
+  PR #1016.
+
+----
+
+## Version 1.6 [2022-02-20]
+
+### Release Notes
+
+This release does not introduce any major new features, but is instead a collection of minor
+improvements and tweaks based on user requests. There are also a number of changes under the hood
+to improve the structure and performance of novelWriter.
+
+Some key improvements to the user interface are:
+
+* The max text width setting in Preferences now also applies to the document viewer, and the
+  setting itself on the Preference dialog has been simplified a bit.
+* When text is selected in the document editor, the number of words selected is displayed in the
+  editor's footer area.
+* The search tool in the document editor now shows the number of results in the document.
+* The Enter and Ctrl+O keyboard shortcuts should now work the same way in all tree views.
+* It is now possible to set a blank section title format on the Build Novel Project tool and get
+  empty paragraphs in the output. Previously, a blank format would just remove the section break
+  entirely. This change allows the user to define hard and soft scene breaks using level three and
+  four headings. The scene and section titles can be hidden completely with two new switches added
+  to the user interface.
+
+Other feature changes include:
+
+* The project index is now automatically rebuilt in the event it is empty or incomplete when the
+  project is opened.
+* The user can now add their own syntax and GUI theme files in the app folder in their user area on
+  the host operating system. Where the custom files must be added is described in the
+  documentation.
+* A Windows installer is yet again provided for novelWriter. If you have novelWriter installed
+  using another method, make sure you uninstall it properly first as the two methods are not
+  compatible.
+* Release versions for Ubuntu 21.04 have been dropped, and added for the upcoming Ubuntu 22.04.
+* Most translations have been updated. A Dutch translation is in the works.
+
+In addition to these changes, the documentation has been completely restructured and a new theme
+added. The theme has a light and a dark mode.
+
+_These Release Notes also include the changes from 1.6 Beta 1 and RC 1._
+
+### Detailed Changelog
+
+**User Interface**
+
+* The default OS font is not always suitable for editing documents. The default editor font is now
+  Arial on Windows and Courier on macOS; if those fonts are available on the platform. Issue #988.
+  PR #990.
+* Added some some random error messages from Discworld to the error dialog shown when novelWriter
+  crashes. They are visible on the dialog title bar if the title bar is visible on the platform.
+  This is just a fun addition made to note the #1000 addition to novelWriter. PR #1000.
+
+**Installation**
+
+* Dropped the Ubuntu 21.04 release as it is now deprecated, and added a release package for the
+  upcoming Ubuntu 22.04. PR #987.
+
+**Internationalisation**
+
+* The French, Norwegian and Portuguese (Brazil) translations have been updated. #992.
+
+**Documentation**
+
+* Some minor improvements have been made to the Introduction section of the documentations.
+  PR #991.
+
+----
+
+## Version 1.6 RC 1 [2022-02-06]
+
+### Release Notes
+
+This is a release candidate for the next release version, and is intended for testing purposes.
+Please be careful when using this version on live writing projects, and make sure you take frequent
+backups.
+
+Please check the changelog for an overview of changes. The full release notes will be added to the
+final release.
+
+### Detailed Changelog
+
+**Features**
+
+* Added switches to hide scene and section breaks on the Build Novel Project tool. This means the
+  section format can now be used like the scene format in that it is possible to leave them blank
+  to insert an empty paragraph into the manuscript. Issue #972. PR #974.
+* The project index is now automatically rebuilt if any of the project files are missing in it when
+  the project is opened. This also solves the issue of an empty index being silently ignored.
+  Issue #957. PR #975.
+
+**User Interface**
+
+* Remove the descriptive labels for all menu entries that were displayed on the status bar. They
+  generally just restated what the menu item label already said, so they weren't very helpful.
+  Removing them, as well as removing or joining a number of other labels and tooltips, reduced the
+  amount of words needing translating for i18n by about 25%. PR #969.
+
+**Installation**
+
+* A Windows setup installer build option has been added again to the main setup script. It builds
+  a setup.exe file with Python and dependencies embedded, based on the minimal zip file of the
+  source for Windows. PRs #981 and #983.
+
+**Bugfixes**
+
+* Fix an issue on Windows where a crash would occur if project and backup paths were on separate
+  drives. Issue #954. PR #955.
+* Fix a JSON error in the Chinese project file translations. PR #963.
+* Make sure the document save call doesn't crash when renaming the temp file to the permanent file
+  name. This caused a crash on a mapped Google Drive. Google Drive on Linux is not supported, but
+  trying to use it still shouldn't cause a crash. Issue #960. PRs #961 and #976.
+
+**Internationalisation**
+
+* Move the whole i18n effort onto Crowdin. This required a few changes to the way i18n files are
+  generated and named. PRs #964, #965, #968, and #970.
+
+**Documentation**
+
+* Remove outdated reference to `pylupdate5` as a dependency for i18n. The needed code is now
+  included with the i18n framework in the source. PR #963.
+* Add a note in the documentation that if the Launchpad PPA is used on Debian, the end point for
+  Ubuntu 20.04 must be used. This is due to a change in the compression algorithm used in later
+  releases. Issue #956. PR #976.
+* Add a new theme for the documentation, and restructure it with better introduction and overview
+  sections. PR #978.
+* Add information on how to customise novelWriter to the documentation. Issue #892. PR #984.
+
+----
+
+## Version 1.6 Beta 1 [2022-01-04]
+
+### Release Notes
+
+This is a beta release of the next release version, and is intended for testing purposes. Please be
+careful when using this version on live writing projects, and make sure you take frequent backups.
+
+Please check the changelog for an overview of changes. The full release notes will be added to the
+final release.
+
+### Detailed Changelog
+
+**Features**
+
+* When text is selected in the editor, the word counter in the editor's footer bar shows the number
+  of selected words instead of the total document word count. Feature Request #896. PR #899.
+* The way page breaks are automatically and manually added has been improved: The Title format no
+  longer has an automatic page break, Partition and Chapter formats now always have a page break,
+  Scene and Section headers can now have page breaks added manually, and empty scene header format
+  will now result in a larger gap between scenes. Feature Request #912. PR #916.
+* The Enter, Return and Ctrl+O keyboard shortcuts now open the selected document or item on the
+  tree that has focus. That is, on the Project Tree, Novel Tree, or in the Outline Tab. Previously,
+  these key strokes only affected the Project Tree. Feature Request #913. PR #945.
+* The search tool in the document editor now shows the number of search results when the search
+  button is clicked. When the replace tool is used, this number changes if the search result does.
+  Feature Request #645. PRs #946 and #947.
+
+**Other Changes**
+
+* The icon themes have been merged and reduced to two complete themes, and the Preferences switch
+  for additional dark icons has been removed. The user either selects the Typicons Dark or Light
+  theme. No need to match further settings. PR #893.
+* Custom GUI themes and syntax themes can now be loaded from the user's data path. The actual
+  storage path is determined by the OS. Part of Feature Request #892. PR #893.
+* A number of text messages and labels on the GUI have been improved. Issue #923. PR #926.
+* The switch in Preferences to disable fixed width text in the editor has been removed. Instead,
+  the user just sets the fixed with setting to 0 to disable it. The settings is now also applied to
+  the document viewer as well. Issue #924. PR #943.
+* The Open Document export file produced from the build tool is now more LibreOffice and OpenOffice
+  friendly by using the same default styles as these editors do. Issue #948. PR #949.
+* When a document is saved from the document editor, the disk on file is checked for external
+  changes before it is overwritten. Such changes can arise from editing the file from another tool
+  at the same time, from file sync issues, or even from file system issues. If an inconsistency is
+  discovered, the user is asked to confirm the overwrite. Issue #878. PR #890.
+
+**Internationalisation**
+
+* A couple of missing translations, and typos, have been fixed. PRs #921 and #926.
+* Latin American Spanish translation has been added by Tommy Marplatt (@tmarplatt). PR #927.
+
+**Bugfixes**
+
+* Fixed an issue where greater or lesser than symbols used in text paragraphs which also has
+  formatting tags would cause the formatting tags to be shifted in HTML output. Issue #929. PR 928.
+  This fix was backported to 1.5 as patch 1.5.2. A secondary bug was reported in Issue #950, fixed
+  in PR #951, and backported to 1.5. as patch 1.5.4.
+
+**Documentation**
+
+* Documentation has been updated to reflect changes and new features. PRs #903, and #916.
+* The Readme file for internationalisation has been updated and improved. Contributed by Tommy
+  Marplatt (@tmarplatt) PR #917.
+
+**Installation and Packaging**
+
+* The Cantarell font is no longer included in the source and releases. PR #893.
+* The way icons are loaded is now simpler and there is no longer a bunch of fallback options. The
+  icon sets have been reduced to just two complete folders of coloured Typicons: one for dark and
+  one for light backgrounds. PR #893.
+* Fixed a couple of issues in the Windows setup scripts where the user never saw the error message
+  reporting on missing Python as the window would close before the user would be able to read the
+  error. PR #903.
+
+**Code Improvements**
+
+* Cleaned up log output, formatting, docstrings, and various other code structure and debug related
+  parts of the source. PRs #904, #926, #930, and #947.
+* Optimised various code snippets, either for performance or readability. The code now makes more
+  use of Python list comprehension and built-in functions for iterables. PRs #904, and #926.
+* Tightened up many of the internal classes, making attributes private, and add setter and getter
+  functions where that makes sense. PRs #904, #931, and #937.
+* The tools for adding and updating translation files have been improved. The Qt-specific `.pro`
+  file has been dropped, and instead the setup tool will scan the entire source tree each time
+  language files are updated. TS files can also be specified to the command, or if none are
+  specified, all files are updated. PR #915.
+* The language file update command in the setup tool now uses the pylupdate6 tool from PyQt6, which
+  has been included directly in the `i18n` folder. This tool uses the newer TS file format, which
+  the standard PyQt5 tool does not. Related to #911. PR #920.
+
+----
+
+## Version 1.5.5 [2022-01-05]
+
+### Release Notes
+
+This is a bugfix release that fixes an issues with the backup tool crashing the app if the project
+path and backup path are on different drive locations. This issue only affects Windows.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* Fixed a bug with using the commonpath command in Python which will raise an error if the two
+  paths don't have a common root. This is particularly an issue on Windows where the paths can be
+  on different drives. The command was used in the project backup function, and has now been
+  replaced by a safer check. Issue #954.
+
+----
+
+## Version 1.5.4 [2022-01-04]
+
+### Release Notes
+
+This is a bugfix release that fixes an issues with rendering HTML from a document, either in the
+viewer or the build tool, when there is a greater or lesser than symbol in a text block that isn't
+a plain text paragraph, like for instance a comment or a heading. Any such document would fail to
+render.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* Fixed a bug where a greater or lesser than symbol would crash the html converter loop if the text
+  block did not have a format with a 'NoneType is not iterable' error. Most blocks that are not
+  plain text have the format set to 'None'. Issue #950, PR #951.
+
+----
+
+## Version 1.5.3 [2021-12-31]
+
+### Release Notes
+
+This is a bugfix release that fixes two cosmetic issues. The first fix resolves and issue with the
+emphasis of partition or chapter items in the project tree not changing when the item is changed to
+a scene item. The second fix changes how the Create Root Folder submenu works. Instead of disabling
+the menu entries that are no longer available, they are instead removed. Disabled menu entries are
+not displayed correctly in all colour themes.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* The syntax themes lack a proper colouring for disabled menu entries. The only place menu entries
+  are disabled is in the Create Root Folder menu, so the simplest solution was to just replace the
+  enable/disable logic with switching on and off visibility like other menus in novelWriter do.
+  Issue #918.
+* The if-condition that determined whether an item in the Project Tree were to receive a bold and
+  underline formatting for its label lacked the logic to disable these when the item should not
+  receive it any longer. I.e., when a chapter was converted to a scene, the emphasis remained.
+  Issue #935.
+
+----
+
+## Version 1.5.2 [2021-12-12]
+
+### Release Notes
+
+This is a bugfix release that fixes two issues. The first is an issue with an error in the HTML
+output if a paragraph has alignment or indentation tags while at the same time containing
+emphasised text. The second is an issue where the application cannot load a project with spell
+checking enabled if there is something wrong with the spell check package.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* When the HTML converter replaced grater than or smaller than symbols with the corresponding HTML
+  entities. the poisition of the formatting tags following in the text would be shifted, but the
+  positions were not updated. This is now solved by updating these positions when such a symbol is
+  encountered. This issue has been backported from 1.6 development. Issue #929.
+* If the pyenchant package is installed, but the underlying enchant library is broken in one way or
+  another, the pyenchant package will error, causing novelWriter to crash. All calls to the
+  pyenchant package has now been wrapped in try/except blocks to prevent this. Issue #933.
+
+----
+
+## Version 1.5.1 [2021-10-23]
+
+### Release Notes
+
+This is a bugfix release that fixes two issues. One related to the Project Details dialog missing
+its translated labels for non-English languages, and a fix concerning switching focus to the
+project tree when the Novel tab is visible. If the Novel tab is selected, the focus shift now
+correctly gives focus to the Novel tree.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* The Project Details dialog source file was previously in the wrong source code folder, and was
+  moved to the correct location in the previous release. However, the translation framework still
+  pointed to the old location. The reference has been fixed and the missing translation strings
+  restored.
+* Pressing the `Alt+1` key to switch focus to the Project Tree while the Novel Tree was in focus
+  would still give focus to the Project Tree, which would be invisible. The focus is now correctly
+  given to the Novel Tree when the tab is visible. Issue #913.
+
+----
+
+## Version 1.5 [2021-09-19]
+
+### Release Notes
+
+This release reduces the number of document layouts from eight to two. The full list of changes is
+described in the "Novel Document Layouts" section below.
+
+Due to this change, the main project file for your projects will need to be updated when you first
+open them in novelWriter 1.5. This is done automatically. The index is updated as well. When this
+conversion is done, you can no longer open the project in an older version of novelWriter.
+
+You may also have to make a handful of changes in your novel documents as novelWriter will not make
+any automated changes to your actual text. However, the changes are minimal and in any case only
+affects the way your manuscript looks like when exported via the Build Novel Project tool. These
+details are also described below.
+
+From this release on, Debian packages will be provided for Mint, Ubuntu and Debian users. A new
+[PPA](https://launchpad.net/~vkbo/+archive/ubuntu/novelwriter) has also been created. This allows
+users to install and update novelWriter automatically on these Linux distros.
+
+#### Novel Document Layouts
+
+The main change in this release is the significant simplification of document layouts. Previously,
+there were seven different layouts available for novel documents, in addition to the one layout for
+project notes. The original intention of these layouts were partially to define some default
+formatting behaviour when exporting your project, and partially as a way to indicate whether a
+specific document was a partition, chapter or scene.
+
+With this release, all the seven layouts for novel documents have been merged into a single layout
+called simply "Novel Document". The other layout, "Project Note", remains unchanged. The
+functionality provided by the various novel layouts have been implemented in other ways, and a few
+new formatting codes have been added to accommodate the formatting functionality lost with the
+removal of the layouts. They are all available in the Format and Insert menus.
+
+The changes you need to make to your project should be limited to altering a handful of titles and
+maybe insert a page break code here and there. The only title formats you need to update are those
+for the main novel title and for your unnumbered chapters, if you have any.
+
+Novel titles need to be altered from `# Novel Title` to `#! Novel Title` and unnumbered chapters
+from `## Chapter Name` or `## *Chapter Name` to `##! Chapter Name`. That is all. For inserting page
+breaks, you can add a single line with the command `[NEW PAGE]` where you want the break to be
+inserted. As before, page breaks are automatically inserted in front of all partition and chapter
+titles.
+
+You will find these changes described in more detail in the documentation in the
+"[Format 1.3 Changes](https://novelwriter.readthedocs.io/en/latest/usage_projectformat.html#a-prjfmt-1-3)"
+section.
+
+#### GUI Changes
+
+Due to the above changes, the GUI has been altered a bit. The main changes are in the project tree.
+These changes are also reflected in the details panel below the project tree, and to a lesser
+extent in the Outline tab.
+
+The layouts were previously a way to indicate the purpose of a specific novel document, like
+whether it was a chapter or scene. With these layouts gone, the distinction is instead indicated by
+other visual means.
+
+The project index will now record the level of the first header of your document, and select a
+different icon for documents with a partition, chapter or scene header. These are colour coded as
+green, red, and blue respectively. The project notes have also received a new icon, with a yellow
+colour code. Due to this change, the grey icon themes have been removed.
+
+In addition, novel documents with a partition or chapter header will have the document label viewed
+as bold and underlined. This feature can be disabled in Preferences if you want a cleaner look in
+the project tree.
+
+#### Other Changes
+
+Several improvements have been made to the project index, which means the index will be
+automatically rebuilt when you open a project for the first time in the new version. You will get a
+notification about this.
+
+The ODT export tool has also been improved. The code that writes out text paragraphs has been
+rewritten and now conforms more closely to the Open Document standard. Most of these improvements
+will not be noticeable to you as a user, but you may notice that the exported document will now
+allow multiple consecutive spaces. Previously, two spaces, or more, would be concatenated into a
+single space in the exported document.
+
+The internal spell check tool has been removed. If you want spell checking, you must install the
+Spell Enchant tool. The internal spell checker was only ever added because the Python package for
+Spell Enchant was not available on 64-bit Windows. This was corrected over a year ago. The main
+issue with the internal spell checker was that it only included English, and the large dictionary
+files had to be shipped with novelWriter.
+
+Finally, a PDF version of the documentation should now be shipped with your install package. If it
+is available, a "User Manual (PDF)" option should be visible in the Help menu. This should give you
+access to the documentation also when you don't have an active internet connection.
+
+_These Release Notes also include the changes from 1.5 Beta 1, Beta 2, and RC 1._
+
+### Detailed Changelog
+
+**Installation and Packaging**
+
+* Most packages built by the setup script have a sha256sum file generated alongside it. PR #886.
+* Snapshot packages version numbers have been fixed so they work properly with the PPA. PR #887.
+
+**Internationalisation**
+
+* The French translation has been updated by @jyhelle. PR #901.
+
+**Code Improvements**
+
+* Removed some redundant and leftover code in the project class associated with dialog boxes during
+  conversion and checking of project file formats. PR #889.
+
+----
+
+## Version 1.5 RC 1 [2021-09-10]
+
+### Release Notes
+
+This is a release candidate of the next release version, and is intended for testing purposes.
+Please be careful when using this version on live writing projects, and make sure you take frequent
+backups.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* Fixed a bug where the setting for how often the word counter is run was not saved between
+  sessions. PR #882.
+* Fix an issue where the information on the Project Details dialog would not be updated if the Qt
+  library had cached the dialog since last time it was opened. Issue #842. PR #883.
+
+**Features**
+
+* The internal spell checker has been removed. It was only ever added for use on Windows as the
+  PyEnchant tool was no longer maintained and not available for 64-bit Windows. This is no longer
+  the case. Having two alternative spell checkers complicated the code a great deal, and the
+  internal spell checker also required full word lists to be distributed with novelWriter. PR #875.
+* Added a setting in Preferences to change how the word count on the status bar is calculated. The
+  new setting allows the project notes to be filetred out, leaving only the word count for novel
+  files. Feature request #857. PR #882.
+
+**Installation and Packaging**
+
+* The command line command for starting novelWriter after running the standard setup has been made
+  lower case. PR #873.
+* A PDF version of the documentation can now be built from the main setup script and is by default
+  distributed with the install packages. The PDF manual can be opened from the Help menu. This is
+  a more accessible solution to looking up the documentation without an internet connection. The
+  old method depended on the Qt Assistant being installed. PRs #873 and #879.
+* The setup script can now build standard `.deb` packages for Debian and Ubuntu. Issue #866. PRs
+  #876 and #879.
+* The icons for novelWriter have been updated and rearranged, and the installation of these
+  simplified a bit. PR #879.
+* The setup script can now build packages for deployment on the Ubuntu PPA (Launchpad). PR #880.
+
+**Internationalisation**
+
+* The US English and Nowregian translation files have been updated. PR #884.
+
+**Documentation**
+
+* The documentation on how to setup and install novelWriter has been updated. PRs #880 and #881.
+
+----
+
+## Version 1.5 Beta 2 [2021-08-26]
+
+### Release Notes
+
+This is a beta release of the next release version, and is intended for testing purposes. Please be
+careful when using this version on live writing projects, and make sure you take frequent backups.
+
+### Detailed Changelog
+
+**Features**
+
+* A new dialog has been added to the Help menu for checking for new updates. It will only check for
+  full releases, not pre-releases. The updates are not installed automatically, but a link to the
+  website is provided. PR #863.
+
+**Other Changes**
+
+* The grey Typicons themes have been removed. The Typicons colour themes have also been renamed.
+  The user configuration will update the theme setting to replace the grey icon theme for dark or
+  light background automatically. PR #869.
+
+**Internationalisation**
+
+* The US English and Nowregian translation files have been updated. PR #870.
+
+**Documentation**
+
+* The Windows Setup section of the documentation has been updated and simplified. PR #865.
+
+**Code Improvements**
+
+* The novelWriter main package folder has been renamed from `nw` to `novelwriter`. This will make
+  it easier to create packages for novelWriter at a later stage. Especially packages which will
+  require adding the main source files to the Python install location. PR #868.
+
+----
+
+## Version 1.5 Beta 1 [2021-08-22]
+
+### Release Notes
+
+This is a beta release of the next release version, and is intended for testing purposes. Please be
+careful when using this version on live writing projects, and make sure you take frequent backups.
+
+### Detailed Changelog
+
+**Bugfixes**
+
+* Fix an inconsistency on the minimum required version of Qt and PyQt between the config files and
+  the code. PR #846.
+* Ensure that an item's status setting is parsed after its class when parsing the main project
+  XML. This is just a precaution as the XML writing function always writes the class setting first.
+  PR #852.
+* On Windows, the Python icon is shown on the task bar when novelWriter is run directly from code.
+  This has now been fixed by setting a unique application ID. Issue #860. PR #861.
+
+**Open Document Exports**
+
+* The ODT file writer class has been improved, and the code that writes out paragraphs and header
+  section to the XML has been completely rewritten. The new algorithm is more robust and follows
+  the open document standard more closely. It still diverts from the standard in a few cases, but
+  these are the same points where Open Office and Libre Office diverts. Issue #783. PR #843.
+* The previous exporter class would sometimes insert additional line breaks in the generated XML
+  for paragraphs. This does not break with the open document standard, but it was unintentional and
+  trivial to fix. PR #843.
+* Some final clean-up was included in PR #859.
+
+**Novel Layouts**
+
+* All novel layouts, that is "TITLE", "PAGE", "BOOK", "PARTITION", "UNNUMBERED", "CHAPTER" and
+  "SCENE" have been merged into a single layout "DOCUMENT". The "NOTE" layout remains unchanged.
+  The special formatting of level one header on the title page and chapter headers for unnumbered
+  chapters is now handled by a modified header formatting code. Issue #835. PR #837.
+* A formatting code for manually inserting page breaks in the text has been added. In the process,
+  similar codes were added to insert vertical spaces in the text. Issue #835. PRs #837 and #848.
+* Dropping the layouts also triggered several changes to how project items are now displayed. The
+  difference between document types is now indicated with a combination of icons and item label
+  emphasis. The last column in the project tree also now only shows the item status or importance,
+  not item class and layout. The Item Details panel below the tree has also been updated to show
+  a usage description instead of layout as the last entry. Issue #835. PRs #847, #849 and #852.
+
+**Other Features**
+
+* A warning will pop up when you launch an alpha version of novelWriter. Since the main branch is
+  now also the development branch, people may run novelWriter directly from source without checking
+  out a release version. Alpha versions are not considered stable. PR #844.
+* Two new settings have been added to Preferences. One to control how much information is shown in
+  the last column of the project tree, and one to control whether emphasis is used to indicate
+  which novel documents contain a level one or two header. PRs #847 and #852.
+* The label on the first column of the project and novel trees have been renamed to "Project Tree"
+  and "Novel Outline", respectively. PR #852.
+* The Help > User Manual (Online) menu entry sends you to the online documentation, and the local
+  documentation is handled by Help > User Manual (PDF), replacing the old Qt Assistant
+  implementation. PRs #856, #859 and #862.
+
+**Documentation**
+
+* The documentation has been updated and extended to cover the new layout behaviour and to provide
+  information and instruction on how to update the project with the new formats. PRs #850, #851 and
+  #855.
+* The technical section of the documentation has been updated, and information on how to run tests
+  has been added. PR #859.
+
+**Code Improvements**
+
+* The loading and saving of user preferences in the config class has been improved a bit and the
+  code modernised to the current recommended practice for the ConfigParser module. PR #826.
+* The index class has been improved. Some data fields that were not being used have been dropped.
+  In addition, a new function has been added that provides a custom indentation scheme for JSON
+  files. The default indentation inserts far too many line breaks. The new function only indents up
+  to a certain level. Indenting the JSON files is useful for people who use version control
+  software on their projects. The limited indentation scheme reduces the number of diff lines as
+  well as reduces the overall file size. PR #840.
+
+----
+
+## Version 1.4.2 [2021-08-30]
+
+### Release Notes
+
+This is a patch release fixing an issue with the auto-replace feature for single and double quotes.
+The issue appears when using the new indent and text alignment codes followed by a quote symbol,
+and quotes following a tab or non-breaking space.
+
+**Bugfixes**
+
+* Any single or double straight quote following a whitespace other than a regular space, or a left
+  indent or right align set of angle bracket codes without a space following them, would be
+  erroneously replaced by a closing quote instead of an opening quote. Issue #874.
+
+----
+
 ## Version 1.4.1 [2021-07-27]
 
 ### Release Notes
@@ -1793,7 +2471,7 @@ planned by GitHub. See their [notes](https://github.com/github/renaming) for mor
 
 ----
 
-## Version 0.10.0 [2020-06-30]
+## Version 0.10 [2020-06-30]
 
 **Note:** If the project file is opened by this version of novelWriter, the project file can no
 longer be read by an earlier version due to the change of how autoReplace settings are stored.

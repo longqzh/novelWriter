@@ -3,7 +3,7 @@ novelWriter – NWTree Class Tester
 =================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,73 +27,73 @@ from hashlib import sha256
 
 from tools import readFile
 
-from nw.core.project import NWProject, NWItem, NWTree
-from nw.enum import nwItemClass, nwItemType, nwItemLayout
-from nw.constants import nwFiles
+from novelwriter.core.project import NWProject, NWItem, NWTree
+from novelwriter.enum import nwItemClass, nwItemType, nwItemLayout
+from novelwriter.constants import nwFiles
 
 
 @pytest.fixture(scope="function")
-def dummyItems(mockGUI):
+def mockItems(mockGUI):
     """Create a list of mock items.
     """
     theProject = NWProject(mockGUI)
 
     itemA = NWItem(theProject)
-    itemA.itemName = "Novel"
-    itemA.itemType = nwItemType.ROOT
-    itemA.itemClass = nwItemClass.NOVEL
-    itemA.isExpanded = True
+    itemA._name = "Novel"
+    itemA._type = nwItemType.ROOT
+    itemA._class = nwItemClass.NOVEL
+    itemA._expanded = True
 
     itemB = NWItem(theProject)
-    itemB.itemName = "Act One"
-    itemB.itemType = nwItemType.FOLDER
-    itemB.itemClass = nwItemClass.NOVEL
-    itemB.isExpanded = True
+    itemB._name = "Act One"
+    itemB._type = nwItemType.FOLDER
+    itemB._class = nwItemClass.NOVEL
+    itemB._expanded = True
 
     itemC = NWItem(theProject)
-    itemC.itemName = "Chapter One"
-    itemC.itemType = nwItemType.FILE
-    itemC.itemClass = nwItemClass.NOVEL
-    itemC.itemLayout = nwItemLayout.CHAPTER
-    itemC.charCount = 300
-    itemC.wordCount = 50
-    itemC.paraCount = 2
+    itemC._name = "Chapter One"
+    itemC._type = nwItemType.FILE
+    itemC._class = nwItemClass.NOVEL
+    itemC._layout = nwItemLayout.DOCUMENT
+    itemC._charCount = 300
+    itemC._wordCount = 50
+    itemC._paraCount = 2
 
     itemD = NWItem(theProject)
-    itemD.itemName = "Scene One"
-    itemD.itemType = nwItemType.FILE
-    itemD.itemClass = nwItemClass.NOVEL
-    itemD.itemLayout = nwItemLayout.SCENE
-    itemD.charCount = 3000
-    itemD.wordCount = 500
-    itemD.paraCount = 20
+    itemD._name = "Scene One"
+    itemD._type = nwItemType.FILE
+    itemD._class = nwItemClass.NOVEL
+    itemD._layout = nwItemLayout.DOCUMENT
+    itemD._charCount = 3000
+    itemD._wordCount = 500
+    itemD._paraCount = 20
 
     itemE = NWItem(theProject)
-    itemE.itemName = "Outtakes"
-    itemE.itemType = nwItemType.ROOT
-    itemE.itemClass = nwItemClass.ARCHIVE
-    itemE.isExpanded = False
+    itemE._name = "Outtakes"
+    itemE._type = nwItemType.ROOT
+    itemE._class = nwItemClass.ARCHIVE
+    itemE._expanded = False
 
     itemF = NWItem(theProject)
-    itemF.itemName = "Trash"
-    itemF.itemType = nwItemType.TRASH
-    itemF.itemClass = nwItemClass.TRASH
-    itemF.isExpanded = False
+    itemF._name = "Trash"
+    itemF._type = nwItemType.TRASH
+    itemF._class = nwItemClass.TRASH
+    itemF._expanded = False
 
     itemG = NWItem(theProject)
-    itemG.itemName = "Characters"
-    itemG.itemType = nwItemType.ROOT
-    itemG.itemClass = nwItemClass.CHARACTER
-    itemG.isExpanded = True
+    itemG._name = "Characters"
+    itemG._type = nwItemType.ROOT
+    itemG._class = nwItemClass.CHARACTER
+    itemG._expanded = True
 
     itemH = NWItem(theProject)
-    itemH.itemName = "Jane Doe"
-    itemH.itemType = nwItemType.FILE
-    itemH.itemClass = nwItemClass.CHARACTER
-    itemH.itemLayout = nwItemLayout.NOTE
-    itemH.charCount = 2000
-    itemH.wordCount = 400
-    itemH.paraCount = 16
+    itemH._name = "Jane Doe"
+    itemH._type = nwItemType.FILE
+    itemH._class = nwItemClass.CHARACTER
+    itemH._layout = nwItemLayout.NOTE
+    itemH._charCount = 2000
+    itemH._wordCount = 400
+    itemH._paraCount = 16
 
     theItems = [
         ("a000000000001", None,            itemA),
@@ -110,7 +110,7 @@ def dummyItems(mockGUI):
 
 
 @pytest.mark.core
-def testCoreTree_BuildTree(mockGUI, dummyItems):
+def testCoreTree_BuildTree(mockGUI, mockItems):
     """Test building a project tree from a list of items.
     """
     theProject = NWProject(mockGUI)
@@ -128,7 +128,7 @@ def testCoreTree_BuildTree(mockGUI, dummyItems):
     assert not theTree.isTrashRoot("a000000000003")
 
     aHandles = []
-    for tHandle, pHandle, nwItem in dummyItems:
+    for tHandle, pHandle, nwItem in mockItems:
         aHandles.append(tHandle)
         assert theTree.append(tHandle, pHandle, nwItem)
 
@@ -138,7 +138,7 @@ def testCoreTree_BuildTree(mockGUI, dummyItems):
     assert theTree
 
     # Check the number of elements (calls __len__)
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
 
     # Check that we have the correct handles
     assert theTree.handles() == aHandles
@@ -154,52 +154,52 @@ def testCoreTree_BuildTree(mockGUI, dummyItems):
 
     # Try to add another trash folder
     itemT = NWItem(theProject)
-    itemT.itemName = "Trash"
-    itemT.itemType = nwItemType.TRASH
-    itemT.itemClass = nwItemClass.TRASH
-    itemT.isExpanded = False
+    itemT._name = "Trash"
+    itemT._type = nwItemType.TRASH
+    itemT._class = nwItemClass.TRASH
+    itemT._expanded = False
 
     assert not theTree.append("1234567890abc", None, itemT)
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
 
     # Generate handle automatically
     itemT = NWItem(theProject)
-    itemT.itemName = "New File"
-    itemT.itemType = nwItemType.FILE
-    itemT.itemClass = nwItemClass.NOVEL
-    itemT.itemLayout = nwItemLayout.SCENE
+    itemT._name = "New File"
+    itemT._type = nwItemType.FILE
+    itemT._class = nwItemClass.NOVEL
+    itemT._layout = nwItemLayout.DOCUMENT
 
     assert theTree.append(None, None, itemT)
-    assert len(theTree) == len(dummyItems) + 1
+    assert len(theTree) == len(mockItems) + 1
 
     theList = theTree.handles()
     assert theList[-1] == "73475cb40a568"
 
     # Try to add existing handle
     assert not theTree.append("73475cb40a568", None, itemT)
-    assert len(theTree) == len(dummyItems) + 1
+    assert len(theTree) == len(mockItems) + 1
 
     # Delete a non-existing item
     del theTree["stuff"]
-    assert len(theTree) == len(dummyItems) + 1
+    assert len(theTree) == len(mockItems) + 1
 
     # Delete the last item
     del theTree["73475cb40a568"]
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
     assert "73475cb40a568" not in theTree
 
     # Delete the Novel, Archive and Trash folders
     del theTree["a000000000001"]
-    assert len(theTree) == len(dummyItems) - 1
+    assert len(theTree) == len(mockItems) - 1
     assert "a000000000001" not in theTree
 
     del theTree["a000000000002"]
-    assert len(theTree) == len(dummyItems) - 2
+    assert len(theTree) == len(mockItems) - 2
     assert "a000000000002" not in theTree
     assert theTree.archiveRoot() is None
 
     del theTree["a000000000003"]
-    assert len(theTree) == len(dummyItems) - 3
+    assert len(theTree) == len(mockItems) - 3
     assert "a000000000003" not in theTree
     assert theTree.trashRoot() is None
 
@@ -207,16 +207,21 @@ def testCoreTree_BuildTree(mockGUI, dummyItems):
 
 
 @pytest.mark.core
-def testCoreTree_Methods(mockGUI, dummyItems):
-    """Test bvarious class methods.
+def testCoreTree_Methods(mockGUI, mockItems):
+    """Test various class methods.
     """
     theProject = NWProject(mockGUI)
     theTree = NWTree(theProject)
 
-    for tHandle, pHandle, nwItem in dummyItems:
+    for tHandle, pHandle, nwItem in mockItems:
         theTree.append(tHandle, pHandle, nwItem)
 
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
+
+    # Chech type
+    assert theTree.checkType("blabla", nwItemType.FILE) is False
+    assert theTree.checkType("b000000000001", nwItemType.FILE) is False
+    assert theTree.checkType("c000000000001", nwItemType.FILE) is True
 
     # Root item lookup
     theTree._treeRoots.append("stuff")
@@ -243,150 +248,24 @@ def testCoreTree_Methods(mockGUI, dummyItems):
     ]
 
     # Break the folder parent handle
-    theTree["b000000000001"].itemParent = "stuff"
+    theTree["b000000000001"]._parent = "stuff"
     assert theTree.getItemPath("c000000000001") == [
         "c000000000001", "b000000000001"
     ]
 
-    theTree["b000000000001"].itemParent = "a000000000001"
+    theTree["b000000000001"]._parent = "a000000000001"
     assert theTree.getItemPath("c000000000001") == [
         "c000000000001", "b000000000001", "a000000000001"
     ]
 
     # Change file layout
-    assert not theTree.setFileItemLayout("stuff", nwItemLayout.UNNUMBERED)
-    assert not theTree.setFileItemLayout("b000000000001", nwItemLayout.UNNUMBERED)
-    assert not theTree.setFileItemLayout("c000000000001", "stuff")
-    assert theTree.setFileItemLayout("c000000000001", nwItemLayout.UNNUMBERED)
-    assert theTree["c000000000001"].itemLayout == nwItemLayout.UNNUMBERED
+    assert theTree.setFileItemLayout("stuff", nwItemLayout.DOCUMENT) is False
+    assert theTree.setFileItemLayout("b000000000001", nwItemLayout.DOCUMENT) is False
+    assert theTree.setFileItemLayout("c000000000001", "stuff") is False
+    assert theTree.setFileItemLayout("c000000000001", nwItemLayout.NOTE) is True
+    assert theTree["c000000000001"].itemLayout == nwItemLayout.NOTE
 
 # END Test testCoreTree_Methods
-
-
-@pytest.mark.core
-def testCoreTree_UpdateItemLayout(mockGUI, dummyItems):
-    """Test building a project tree from a list of items.
-    """
-    theProject = NWProject(mockGUI)
-    theTree = NWTree(theProject)
-
-    for tHandle, pHandle, nwItem in dummyItems:
-        theTree.append(tHandle, pHandle, nwItem)
-
-    assert len(theTree) == len(dummyItems)
-
-    # Check rejected items
-    assert not theTree.updateItemLayout("0000000000000", "H1")  # Non-existent handle
-    assert not theTree.updateItemLayout("a000000000004", "H2")  # Character file
-    assert not theTree.updateItemLayout("c000000000002", "H0")  # Wrong header level
-
-    cHandle = "c000000000002"
-
-    # Check layouts we won't change
-    theTree[cHandle].setLayout(nwItemLayout.NO_LAYOUT)
-    assert not theTree.updateItemLayout("c000000000002", "H1")
-
-    theTree[cHandle].setLayout(nwItemLayout.TITLE)
-    assert not theTree.updateItemLayout("c000000000002", "H1")
-
-    theTree[cHandle].setLayout(nwItemLayout.PAGE)
-    assert not theTree.updateItemLayout("c000000000002", "H1")
-
-    theTree[cHandle].setLayout(nwItemLayout.NOTE)
-    assert not theTree.updateItemLayout("c000000000002", "H1")
-
-    # BOOK is also a layout we change to, but never from
-    theTree[cHandle].setLayout(nwItemLayout.BOOK)
-    assert not theTree.updateItemLayout("c000000000002", "H1")
-
-    # Test SCENE Changes
-    # ==================
-
-    # H1 -> BOOK
-    theTree[cHandle].setLayout(nwItemLayout.SCENE)
-    assert theTree.updateItemLayout("c000000000002", "H1")
-    assert theTree[cHandle].itemLayout == nwItemLayout.BOOK
-
-    # H2 -> CHAPTER
-    theTree[cHandle].setLayout(nwItemLayout.SCENE)
-    assert theTree.updateItemLayout("c000000000002", "H2")
-    assert theTree[cHandle].itemLayout == nwItemLayout.CHAPTER
-
-    # H3 -> No CHange
-    theTree[cHandle].setLayout(nwItemLayout.SCENE)
-    assert not theTree.updateItemLayout("c000000000002", "H3")
-
-    # H4 -> No CHange
-    theTree[cHandle].setLayout(nwItemLayout.SCENE)
-    assert not theTree.updateItemLayout("c000000000002", "H4")
-
-    # Test CHAPTER Changes
-    # ====================
-
-    # H1 -> BOOK
-    theTree[cHandle].setLayout(nwItemLayout.CHAPTER)
-    assert theTree.updateItemLayout("c000000000002", "H1")
-    assert theTree[cHandle].itemLayout == nwItemLayout.BOOK
-
-    # H2 -> No Change
-    theTree[cHandle].setLayout(nwItemLayout.CHAPTER)
-    assert not theTree.updateItemLayout("c000000000002", "H2")
-
-    # H3 -> SCENE
-    theTree[cHandle].setLayout(nwItemLayout.CHAPTER)
-    assert theTree.updateItemLayout("c000000000002", "H3")
-    assert theTree[cHandle].itemLayout == nwItemLayout.SCENE
-
-    # H4 -> SCENE
-    theTree[cHandle].setLayout(nwItemLayout.CHAPTER)
-    assert theTree.updateItemLayout("c000000000002", "H4")
-    assert theTree[cHandle].itemLayout == nwItemLayout.SCENE
-
-    # Test UNNUMBERED Changes
-    # =======================
-
-    # H1 -> BOOK
-    theTree[cHandle].setLayout(nwItemLayout.UNNUMBERED)
-    assert theTree.updateItemLayout("c000000000002", "H1")
-    assert theTree[cHandle].itemLayout == nwItemLayout.BOOK
-
-    # H2 -> No Change
-    theTree[cHandle].setLayout(nwItemLayout.UNNUMBERED)
-    assert not theTree.updateItemLayout("c000000000002", "H2")
-
-    # H3 -> SCENE
-    theTree[cHandle].setLayout(nwItemLayout.UNNUMBERED)
-    assert theTree.updateItemLayout("c000000000002", "H3")
-    assert theTree[cHandle].itemLayout == nwItemLayout.SCENE
-
-    # H4 -> SCENE
-    theTree[cHandle].setLayout(nwItemLayout.UNNUMBERED)
-    assert theTree.updateItemLayout("c000000000002", "H4")
-    assert theTree[cHandle].itemLayout == nwItemLayout.SCENE
-
-    # Test PARTITION Changes
-    # ======================
-
-    # H1 -> BOOK
-    theTree[cHandle].setLayout(nwItemLayout.PARTITION)
-    assert not theTree.updateItemLayout("c000000000002", "H1")
-
-    # H2 -> No Change
-    theTree[cHandle].setLayout(nwItemLayout.PARTITION)
-    assert theTree.updateItemLayout("c000000000002", "H2")
-    assert theTree[cHandle].itemLayout == nwItemLayout.CHAPTER
-
-    # H3 -> SCENE
-    theTree[cHandle].setLayout(nwItemLayout.PARTITION)
-    assert theTree.updateItemLayout("c000000000002", "H3")
-    assert theTree[cHandle].itemLayout == nwItemLayout.SCENE
-
-    # H4 -> SCENE
-    theTree[cHandle].setLayout(nwItemLayout.PARTITION)
-    assert theTree.updateItemLayout("c000000000002", "H4")
-    assert theTree[cHandle].itemLayout == nwItemLayout.SCENE
-
-# END Test testCoreTree_UpdateItemLayout
 
 
 @pytest.mark.core
@@ -409,7 +288,7 @@ def testCoreTree_MakeHandles(monkeypatch, mockGUI):
     # Fix the time() function and force a handle collission
     theTree.setSeed(None)
     theTree._handleCount = 0
-    monkeypatch.setattr("nw.core.tree.time", lambda: 123.4)
+    monkeypatch.setattr("novelwriter.core.tree.time", lambda: 123.4)
 
     tHandle = theTree._makeHandle()
     theTree._projTree[tHandle] = None
@@ -433,16 +312,16 @@ def testCoreTree_MakeHandles(monkeypatch, mockGUI):
 
 
 @pytest.mark.core
-def testCoreTree_Stats(mockGUI, dummyItems):
+def testCoreTree_Stats(mockGUI, mockItems):
     """Test project stats methods.
     """
     theProject = NWProject(mockGUI)
     theTree = NWTree(theProject)
 
-    for tHandle, pHandle, nwItem in dummyItems:
+    for tHandle, pHandle, nwItem in mockItems:
         theTree.append(tHandle, pHandle, nwItem)
 
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
     theTree._treeOrder.append("stuff")
 
     # Count Words
@@ -460,18 +339,18 @@ def testCoreTree_Stats(mockGUI, dummyItems):
 
 
 @pytest.mark.core
-def testCoreTree_Reorder(mockGUI, dummyItems):
+def testCoreTree_Reorder(mockGUI, mockItems):
     """Test changing tree order.
     """
     theProject = NWProject(mockGUI)
     theTree = NWTree(theProject)
 
     aHandle = []
-    for tHandle, pHandle, nwItem in dummyItems:
+    for tHandle, pHandle, nwItem in mockItems:
         aHandle.append(tHandle)
         theTree.append(tHandle, pHandle, nwItem)
 
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
 
     bHandle = aHandle.copy()
     bHandle[2], bHandle[3] = bHandle[3], bHandle[2]
@@ -492,75 +371,69 @@ def testCoreTree_Reorder(mockGUI, dummyItems):
 
 
 @pytest.mark.core
-def testCoreTree_XMLPackUnpack(mockGUI, dummyItems):
+def testCoreTree_XMLPackUnpack(mockGUI, mockItems):
     """Test packing and unpacking the tree to and from XML.
     """
     theProject = NWProject(mockGUI)
     theTree = NWTree(theProject)
 
-    for tHandle, pHandle, nwItem in dummyItems:
+    for tHandle, pHandle, nwItem in mockItems:
         theTree.append(tHandle, pHandle, nwItem)
 
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
 
     nwXML = etree.Element("novelWriterXML")
     theTree.packXML(nwXML)
     assert etree.tostring(nwXML, pretty_print=False, encoding="utf-8") == (
-        b"<novelWriterXML>"
-        b"<content count=\"8\">"
-        b"<item handle=\"a000000000001\" order=\"0\" parent=\"None\">"
-        b"<name>Novel</name><type>ROOT</type><class>NOVEL</class><status>None</status>"
-        b"<expanded>True</expanded></item>"
-        b"<item handle=\"b000000000001\" order=\"0\" parent=\"a000000000001\">"
-        b"<name>Act One</name><type>FOLDER</type><class>NOVEL</class><status>None</status>"
-        b"<expanded>True</expanded></item>"
-        b"<item handle=\"c000000000001\" order=\"0\" parent=\"b000000000001\">"
-        b"<name>Chapter One</name><type>FILE</type><class>NOVEL</class><status>None</status>"
-        b"<exported>True</exported><layout>CHAPTER</layout><charCount>300</charCount>"
-        b"<wordCount>50</wordCount><paraCount>2</paraCount><cursorPos>0</cursorPos></item>"
-        b"<item handle=\"c000000000002\" order=\"0\" parent=\"b000000000001\">"
-        b"<name>Scene One</name><type>FILE</type><class>NOVEL</class><status>None</status>"
-        b"<exported>True</exported><layout>SCENE</layout><charCount>3000</charCount>"
-        b"<wordCount>500</wordCount><paraCount>20</paraCount><cursorPos>0</cursorPos></item>"
-        b"<item handle=\"a000000000002\" order=\"0\" parent=\"None\">"
-        b"<name>Outtakes</name><type>ROOT</type><class>ARCHIVE</class><status>None</status>"
-        b"<expanded>False</expanded></item>"
-        b"<item handle=\"a000000000003\" order=\"0\" parent=\"None\">"
-        b"<name>Trash</name><type>TRASH</type><class>TRASH</class><status>None</status>"
-        b"<expanded>False</expanded></item>"
-        b"<item handle=\"a000000000004\" order=\"0\" parent=\"None\">"
-        b"<name>Characters</name><type>ROOT</type><class>CHARACTER</class><status>None</status>"
-        b"<expanded>True</expanded></item>"
-        b"<item handle=\"b000000000002\" order=\"0\" parent=\"a000000000002\">"
-        b"<name>Jane Doe</name><type>FILE</type><class>CHARACTER</class><status>None</status>"
-        b"<exported>True</exported><layout>NOTE</layout><charCount>2000</charCount>"
-        b"<wordCount>400</wordCount><paraCount>16</paraCount><cursorPos>0</cursorPos></item>"
-        b"</content></novelWriterXML>"
+        b'<novelWriterXML>'
+        b'<content count="8">'
+        b'<item handle="a000000000001" parent="None" order="0" type="ROOT" class="NOVEL"><meta '
+        b'expanded="True"/><name status="None" import="None">Novel</name></item>'
+        b'<item handle="b000000000001" parent="a000000000001" order="0" type="FOLDER" '
+        b'class="NOVEL"><meta expanded="True"/><name status="None" import="None">Act One</name>'
+        b'</item>'
+        b'<item handle="c000000000001" parent="b000000000001" order="0" type="FILE" class="NOVEL" '
+        b'layout="DOCUMENT"><meta charCount="300" wordCount="50" paraCount="2" cursorPos="0"/>'
+        b'<name status="None" import="None" exported="True">Chapter One</name></item>'
+        b'<item handle="c000000000002" parent="b000000000001" order="0" type="FILE" class="NOVEL" '
+        b'layout="DOCUMENT"><meta charCount="3000" wordCount="500" paraCount="20" cursorPos="0"/>'
+        b'<name status="None" import="None" exported="True">Scene One</name></item>'
+        b'<item handle="a000000000002" parent="None" order="0" type="ROOT" class="ARCHIVE"><meta '
+        b'expanded="False"/><name status="None" import="None">Outtakes</name></item>'
+        b'<item handle="a000000000003" parent="None" order="0" type="TRASH" class="TRASH"><meta '
+        b'expanded="False"/><name status="None" import="None">Trash</name></item>'
+        b'<item handle="a000000000004" parent="None" order="0" type="ROOT" class="CHARACTER">'
+        b'<meta expanded="True"/><name status="None" import="None">Characters</name></item>'
+        b'<item handle="b000000000002" parent="a000000000002" order="0" type="FILE" '
+        b'class="CHARACTER" layout="NOTE"><meta charCount="2000" wordCount="400" paraCount="16" '
+        b'cursorPos="0"/><name status="None" import="None" exported="True">Jane Doe</name></item>'
+        b'</content>'
+        b'</novelWriterXML>'
     )
 
     theTree.clear()
     assert len(theTree) == 0
     assert not theTree.unpackXML(nwXML)
     assert theTree.unpackXML(nwXML[0])
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
 
 # END Test testCoreTree_XMLPackUnpack
 
 
 @pytest.mark.core
-def testCoreTree_ToCFile(monkeypatch, mockGUI, dummyItems, tmpDir):
+def testCoreTree_ToCFile(monkeypatch, mockGUI, mockItems, tmpDir):
     """Test writing the ToC.txt file.
     """
     theProject = NWProject(mockGUI)
     theTree = NWTree(theProject)
 
-    for tHandle, pHandle, nwItem in dummyItems:
+    for tHandle, pHandle, nwItem in mockItems:
         theTree.append(tHandle, pHandle, nwItem)
 
-    assert len(theTree) == len(dummyItems)
+    assert len(theTree) == len(mockItems)
     theTree._treeOrder.append("stuff")
 
-    def dummyIsFile(fileName):
+    def mockIsFile(fileName):
         """Return True for items that are files in novelWriter and
         should thus also be files in the project folder structure.
         """
@@ -568,7 +441,7 @@ def testCoreTree_ToCFile(monkeypatch, mockGUI, dummyItems, tmpDir):
         assert dItem is not None
         return dItem.itemType == nwItemType.FILE
 
-    monkeypatch.setattr("os.path.isfile", dummyIsFile)
+    monkeypatch.setattr("os.path.isfile", mockIsFile)
 
     theProject.projContent = "content"
     theProject.projPath = None
@@ -586,11 +459,11 @@ def testCoreTree_ToCFile(monkeypatch, mockGUI, dummyItems, tmpDir):
         "Table of Contents\n"
         "=================\n"
         "\n"
-        "File Name                  Class      Layout      Document Label\n"
-        "-------------------------------------------------------------\n"
-        f"{pathA}  NOVEL      CHAPTER     Chapter One\n"
-        f"{pathB}  NOVEL      SCENE       Scene One\n"
-        f"{pathC}  CHARACTER  NOTE        Jane Doe\n"
+        "File Name                  Class      Layout    Document Label\n"
+        "--------------------------------------------------------------\n"
+        f"{pathA}  NOVEL      DOCUMENT  Chapter One\n"
+        f"{pathB}  NOVEL      DOCUMENT  Scene One\n"
+        f"{pathC}  CHARACTER  NOTE      Jane Doe\n"
     )
 
 # END Test testCoreTree_ToCFile

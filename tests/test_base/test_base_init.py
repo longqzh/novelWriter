@@ -3,7 +3,7 @@ novelWriter – Main Init Tester
 ==============================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 
-import nw
+import sys
 import pytest
 import logging
-import sys
+import novelwriter
 
 from mock import MockGuiMain
 
@@ -31,36 +31,48 @@ from mock import MockGuiMain
 def testBaseInit_Launch(caplog, monkeypatch, tmpDir):
     """Check launching the main GUI.
     """
-    monkeypatch.setattr("nw.guimain.GuiMain", MockGuiMain)
+    monkeypatch.setattr("novelwriter.guimain.GuiMain", MockGuiMain)
 
-    # Testmode launch
-    nwGUI = nw.main(
-        ["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
-    )
+    # TestMode Launch
+    nwGUI = novelwriter.main(["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir])
     assert isinstance(nwGUI, MockGuiMain)
 
-    # Darwin launch
-    monkeypatch.setitem(sys.modules, "Foundation", None)
-    osDarwin = nw.CONFIG.osDarwin
-    nw.CONFIG.osDarwin = True
-    nwGUI = nw.main(
-        ["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
-    )
-    assert isinstance(nwGUI, MockGuiMain)
-    assert "Foundation" in caplog.messages[1]
-    nw.CONFIG.osDarwin = osDarwin
+    # Darwin Launch
+    caplog.clear()
+    osDarwin = novelwriter.CONFIG.osDarwin
+    novelwriter.CONFIG.osDarwin = True
+    with monkeypatch.context() as mp:
+        mp.setitem(sys.modules, "Foundation", None)
+        nwGUI = novelwriter.main(["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir])
+        assert isinstance(nwGUI, MockGuiMain)
+        assert "Failed" in caplog.text
 
-    # Normal launch
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.__init__", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setApplicationName", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setApplicationVersion", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setWindowIcon", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setOrganizationDomain", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.exec_", lambda *args: 0)
+    novelwriter.CONFIG.osDarwin = osDarwin
+
+    # Windows Launch
+    caplog.clear()
+    osWindows = novelwriter.CONFIG.osWindows
+    novelwriter.CONFIG.osWindows = True
+    with monkeypatch.context() as mp:
+        mp.setitem(sys.modules, "ctypes", None)
+        nwGUI = novelwriter.main(["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir])
+        assert isinstance(nwGUI, MockGuiMain)
+        if not sys.platform.startswith("darwin"):
+            # For some reason, the test doesn't work on macOS
+            assert "Failed" in caplog.text
+
+    novelwriter.CONFIG.osWindows = osWindows
+
+    # Normal Launch
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.__init__", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setApplicationName", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setApplicationVersion", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setWindowIcon", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.setOrganizationDomain", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.exec_", lambda *a: 0)
     with pytest.raises(SystemExit) as ex:
-        nw.main(["--config=%s" % tmpDir, "--data=%s" % tmpDir])
-
-    assert ex.value.code == 0
+        novelwriter.main(["--config=%s" % tmpDir, "--data=%s" % tmpDir])
+        assert ex.value.code == 0
 
 # END Test testBaseInit_Launch
 
@@ -69,52 +81,52 @@ def testBaseInit_Launch(caplog, monkeypatch, tmpDir):
 def testBaseInit_Options(monkeypatch, tmpDir):
     """Test command line options for logging level.
     """
-    monkeypatch.setattr("nw.guimain.GuiMain", MockGuiMain)
+    monkeypatch.setattr("novelwriter.guimain.GuiMain", MockGuiMain)
     monkeypatch.setattr(sys, "argv", [
         "novelWriter.py", "--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir
     ])
 
     # Defaults w/None Args
-    nwGUI = nw.main()
-    assert nw.logger.getEffectiveLevel() == logging.WARNING
+    nwGUI = novelwriter.main()
+    assert novelwriter.logger.getEffectiveLevel() == logging.WARNING
     assert nwGUI.closeMain() == "closeMain"
 
     # Defaults
-    nwGUI = nw.main(
+    nwGUI = novelwriter.main(
         ["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir, "--style=Fusion"]
     )
-    assert nw.logger.getEffectiveLevel() == logging.WARNING
+    assert novelwriter.logger.getEffectiveLevel() == logging.WARNING
     assert nwGUI.closeMain() == "closeMain"
 
     # Log Levels
-    nwGUI = nw.main(
+    nwGUI = novelwriter.main(
         ["--testmode", "--info", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
     )
-    assert nw.logger.getEffectiveLevel() == logging.INFO
+    assert novelwriter.logger.getEffectiveLevel() == logging.INFO
     assert nwGUI.closeMain() == "closeMain"
 
-    nwGUI = nw.main(
+    nwGUI = novelwriter.main(
         ["--testmode", "--debug", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
     )
-    assert nw.logger.getEffectiveLevel() == logging.DEBUG
+    assert novelwriter.logger.getEffectiveLevel() == logging.DEBUG
     assert nwGUI.closeMain() == "closeMain"
 
-    nwGUI = nw.main(
+    nwGUI = novelwriter.main(
         ["--testmode", "--verbose", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
     )
-    assert nw.logger.getEffectiveLevel() == 5
+    assert novelwriter.logger.getEffectiveLevel() == 5
     assert nwGUI.closeMain() == "closeMain"
 
     # Help and Version
     with pytest.raises(SystemExit) as ex:
-        nwGUI = nw.main(
+        nwGUI = novelwriter.main(
             ["--testmode", "--help", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
         )
     assert nwGUI.closeMain() == "closeMain"
     assert ex.value.code == 0
 
     with pytest.raises(SystemExit) as ex:
-        nwGUI = nw.main(
+        nwGUI = novelwriter.main(
             ["--testmode", "--version", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
         )
     assert nwGUI.closeMain() == "closeMain"
@@ -122,17 +134,17 @@ def testBaseInit_Options(monkeypatch, tmpDir):
 
     # Invalid options
     with pytest.raises(SystemExit) as ex:
-        nwGUI = nw.main(
+        nwGUI = novelwriter.main(
             ["--testmode", "--invalid", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
         )
     assert nwGUI.closeMain() == "closeMain"
     assert ex.value.code == 2
 
     # Project Path
-    nwGUI = nw.main(
+    nwGUI = novelwriter.main(
         ["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir, "sample/"]
     )
-    assert nw.CONFIG.cmdOpen == "sample/"
+    assert novelwriter.CONFIG.cmdOpen == "sample/"
     assert nwGUI.closeMain() == "closeMain"
 
 # END Test testBaseInit_Options
@@ -142,19 +154,19 @@ def testBaseInit_Options(monkeypatch, tmpDir):
 def testBaseInit_Imports(caplog, monkeypatch, tmpDir):
     """Check import error handling.
     """
-    monkeypatch.setattr("nw.guimain.GuiMain", MockGuiMain)
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.__init__", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.exec_", lambda *args: 0)
-    monkeypatch.setattr("PyQt5.QtWidgets.QErrorMessage.__init__", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QErrorMessage.resize", lambda *args: None)
-    monkeypatch.setattr("PyQt5.QtWidgets.QErrorMessage.showMessage", lambda *args: None)
+    monkeypatch.setattr("novelwriter.guimain.GuiMain", MockGuiMain)
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.__init__", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QApplication.exec_", lambda *a: 0)
+    monkeypatch.setattr("PyQt5.QtWidgets.QErrorMessage.__init__", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QErrorMessage.resize", lambda *a: None)
+    monkeypatch.setattr("PyQt5.QtWidgets.QErrorMessage.showMessage", lambda *a: None)
     monkeypatch.setitem(sys.modules, "lxml", None)
     monkeypatch.setattr("sys.hexversion", 0x0)
-    monkeypatch.setattr("nw.CONFIG.verQtValue", 50000)
-    monkeypatch.setattr("nw.CONFIG.verPyQtValue", 50000)
+    monkeypatch.setattr("novelwriter.CONFIG.verQtValue", 50000)
+    monkeypatch.setattr("novelwriter.CONFIG.verPyQtValue", 50000)
 
     with pytest.raises(SystemExit) as ex:
-        _ = nw.main(
+        _ = novelwriter.main(
             ["--testmode", "--config=%s" % tmpDir, "--data=%s" % tmpDir]
         )
 

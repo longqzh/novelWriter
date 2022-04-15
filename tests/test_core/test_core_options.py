@@ -3,7 +3,7 @@ novelWriter – OptionState Class Tester
 ======================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import pytest
 from mock import causeOSError
 from tools import writeFile
 
-from nw.core import NWProject
-from nw.core.options import OptionState
-from nw.constants import nwFiles
+from novelwriter.core import NWProject
+from novelwriter.core.options import OptionState
+from novelwriter.constants import nwFiles
 
 
 @pytest.mark.core
@@ -47,10 +47,10 @@ def testCoreOptions_LoadSave(monkeypatch, mockGUI, tmpDir):
             "addNovel": True,
             "addNotes": False,
             "textFont": "Cantarell",
-            "dummyItem": None,
+            "mockItem": None,
         },
-        "DummyGroup": {
-            "dummyItem": None,
+        "MockGroup": {
+            "mockItem": None,
         },
     }))
 
@@ -73,7 +73,7 @@ def testCoreOptions_LoadSave(monkeypatch, mockGUI, tmpDir):
     assert theOpts.loadSettings()
 
     # Check that unwanted items have been removed
-    assert theOpts.theState == {
+    assert theOpts._theState == {
         "GuiBuildNovel": {
             "winWidth": 1000,
             "winHeight": 700,
@@ -88,7 +88,7 @@ def testCoreOptions_LoadSave(monkeypatch, mockGUI, tmpDir):
 
     # Load again to check we get the values back
     assert theOpts.loadSettings()
-    assert theOpts.theState == {
+    assert theOpts._theState == {
         "GuiBuildNovel": {
             "winWidth": 1000,
             "winHeight": 700,
@@ -109,8 +109,8 @@ def testCoreOptions_SetGet(mockGUI):
     theOpts = OptionState(theProject)
 
     # Set invalid values
-    assert not theOpts.setValue("DummyGroup", "dummyItem", None)
-    assert not theOpts.setValue("GuiBuildNovel", "dummyItem", None)
+    assert not theOpts.setValue("MockGroup", "mockItem", None)
+    assert not theOpts.setValue("GuiBuildNovel", "mockItem", None)
 
     # Set valid value
     assert theOpts.setValue("GuiBuildNovel", "winWidth", 100)
@@ -126,27 +126,18 @@ def testCoreOptions_SetGet(mockGUI):
     assert theOpts.getValue("GuiBuildNovel", "winHeight", None) == 12.34
     assert theOpts.getValue("GuiBuildNovel", "addNovel", None) is True
     assert theOpts.getValue("GuiBuildNovel", "textFont", None) == "Cantarell"
-    assert theOpts.getValue("GuiBuildNovel", "dummyItem", None) is None
+    assert theOpts.getValue("GuiBuildNovel", "mockItem", None) is None
 
     # Get type-specific
-    assert theOpts.getString("GuiBuildNovel", "winWidth", None) == "100"
-    assert theOpts.getString("GuiBuildNovel", "dummyItem", None) is None
+    assert theOpts.getString("GuiBuildNovel", "winWidth", None) is None
+    assert theOpts.getString("GuiBuildNovel", "mockItem", None) is None
     assert theOpts.getInt("GuiBuildNovel", "winWidth", None) == 100
     assert theOpts.getInt("GuiBuildNovel", "textFont", None) is None
-    assert theOpts.getInt("GuiBuildNovel", "dummyItem", None) is None
+    assert theOpts.getInt("GuiBuildNovel", "mockItem", None) is None
     assert theOpts.getFloat("GuiBuildNovel", "winWidth", None) == 100.0
     assert theOpts.getFloat("GuiBuildNovel", "textFont", None) is None
-    assert theOpts.getFloat("GuiBuildNovel", "dummyItem", None) is None
+    assert theOpts.getFloat("GuiBuildNovel", "mockItem", None) is None
     assert theOpts.getBool("GuiBuildNovel", "addNovel", None) is True
-    assert theOpts.getBool("GuiBuildNovel", "dummyItem", None) is None
-
-    # Check integer validators
-    assert theOpts.validIntRange(5, 0, 9, 3) == 5
-    assert theOpts.validIntRange(5, 0, 4, 3) == 3
-    assert theOpts.validIntRange(5, 0, 5, 3) == 5
-    assert theOpts.validIntRange(0, 0, 5, 3) == 0
-
-    assert theOpts.validIntTuple(0, (0, 1, 2), 3) == 0
-    assert theOpts.validIntTuple(5, (0, 1, 2), 3) == 3
+    assert theOpts.getBool("GuiBuildNovel", "mockItem", None) is None
 
 # END Test testCoreOptions_SetGet

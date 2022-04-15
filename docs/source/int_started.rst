@@ -4,167 +4,238 @@
 Getting Started
 ***************
 
+.. _brew docs: https://docs.brew.sh/Homebrew-and-Python
+.. _Enchant: https://abiword.github.io/enchant/
+.. _GitHub: https://github.com/vkbo/novelWriter
+.. _macOS: https://github.com/vkbo/novelWriter/issues/867
 .. _main website: https://novelwriter.io
-.. _GitHub: https://github.com/vkbo/novelWriter/releases
+.. _PPA: https://launchpad.net/~vkbo/+archive/ubuntu/novelwriter
+.. _Pre-Release PPA: https://launchpad.net/~vkbo/+archive/ubuntu/novelwriter-pre
 .. _PyPi: https://pypi.org/project/novelWriter/
+.. _python.org: https://www.python.org/downloads/windows
+.. _Releases: https://github.com/vkbo/novelWriter/releases
+.. _RPM: https://github.com/vkbo/novelWriter/issues/907
 
-This section contains brief guides to how you can get novelWriter running on your computer. These
-are the methods currently supported by the developer. Packages may also be available in other
-package managers, but those are not managed by the developer. No installers are provided at this
-time, but it is fairly straightforward to set up novelWriter with the provided install scripts.
+If you are using Windows or a Debian-based Linux distribtuion, you can install novelWriter from
+package installers. If you are on macOS, you have the option to run novelWriter from a standalone
+folder. See :ref:`a_started_minimal`. This option is also available for Windows and Linux. The
+third option is to install novelWriter from the Python Package Index. See :ref:`a_started_pip`.
 
-As novelWriter matures, more options for how to install it and get it running will be added. For
-non-Windows users the install process is at the present time best suited for people used to working
-with the command line. But even if you're not, the install process is fairly straightforward.
+Spell checking in novelWriter is provided by a third party library called Enchant_. Generally, it
+should pull dictionaries from your operating system automatically. However, on Windows they must be
+installed manually. See :ref:`a_custom_dict` for more details.
 
-The next pages have specific install instructions for the various operating systems novelWriter can
-run on. The instructions below are supplementary information, instructions for alterbative methods,
-and additional build options.
+.. admonition:: Help Wanted
+   :class: seealso
+
+   If you would like to help making more installers, the project is currently looking for people
+   who can help make releases for Red Hat-based Linux distros (RPM) and for macOS. See the issues
+   posted for RPM_ and macOS_ on GitHub_.
+
+
+.. _a_started_windows:
+
+Install on Windows
+==================
+
+You can install novelWriter with both Python and library dependencies embedded using the Windows
+Installer (setup.exe) file from the `main website`_, or from the Releases_ page on GitHub.
+Installing it should be straightforward.
+
+If you have any issues, try uninstalling the previous version and making a fresh install. If you
+already had a version installed via a different method, you should uninstall that first.
+
+
+.. _a_started_debian:
+
+Install on Debian/Ubuntu/Mint
+=============================
+
+A Debian package can be downloaded from the `main website`_, or from the Releases_ page on GitHub.
+This package should work on both Debian, Ubuntu and Linux Mint.
+
+If you prefer, you can also add the novelWriter repository on Launchpad to your package manager.
+
+
+Ubuntu and Mint
+---------------
+
+You can add the Ubuntu PPA_ and install novelWriter with the following commands.
+
+.. code-block:: bash
+
+   sudo add-apt-repository ppa:vkbo/novelwriter
+   sudo apt update
+   sudo apt install novelwriter
+
+If you want pre-releases, add the ``ppa:vkbo/novelwriter-pre`` repository instead.
+
+
+Debian
+------
+
+Since this is a pure Python package, the Launchpad PPA can in principle also be used on Debian.
+However, the above command will fail to add the signing key.
+
+Instead, run the following commands to add the repository and key:
+
+.. code-block:: bash
+
+   sudo gpg --no-default-keyring --keyring /usr/share/keyrings/novelwriter-ppa-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F19F1FCE50043114
+   echo "deb [signed-by=/usr/share/keyrings/novelwriter-ppa-keyring.gpg] http://ppa.launchpad.net/vkbo/novelwriter/ubuntu focal main" | sudo tee /etc/apt/sources.list.d/novelwriter.list
+
+Then run the update and install commands as for Ubuntu:
+
+.. code-block:: bash
+
+   sudo apt update
+   sudo apt install novelwriter
 
 .. note::
-   The text below assumes the command ``python`` corresponds to a Python 3 executable. Python 2 is
-   now deprecated, but many systems still have both Python 2 and 3. For such systems, the command
-   ``python3`` may be needed instead. On Linux, the scripts can also be made executable and run
-   without the ``python`` command. Likewise, ``pip`` may need to be replaced with ``pip3``.
+
+   Please use the Ubuntu 20.04 (focal) packages for Debian. The newer Ubuntu packages use a
+   different compression algorithm that Debian doesn't currently support.
 
 
-.. _a_started_depend:
+.. _a_started_minimal:
 
-Dependencies
-============
+Minimal Package Install
+=======================
 
-novelWriter has been designed to rely on as few dependencies as possible. Aside from the packages
-needed to communicate with the Qt GUI libraries, only one package is required for handling the XML
-format of the main project file. Everything else is handled with standard Python libraries.
+On the `main website`_ and on the Releases_ page on GitHub you will also find "Minimal Package"
+install files for Windows, Linux and macOS. These are zip files of just the files you need to run
+novelWriter on that specific platform.
 
-The following Python packages are needed to run novelWriter:
-
-* ``pyqt5`` – needed for connecting with the Qt5 libraries.
-* ``lxml`` – needed for full XML support.
-* ``pyenchant`` – needed for efficient spell checking (optional).
-
-PyQt/Qt should be at least 5.3, but ideally 5.10 or higher for nearly all features to work. For
-instance, searching using regular expressions with full Unicode support requires 5.13. There is no
-known minimum version requirement for package ``lxml``, but the code was originally written with
-4.2, which is therefore set as the minimum. It may work on lower versions. You have to test it.
-
-Optionally, a package can be installed to interface with the Enchant spell checking libaries, but
-this isn't strictly required. If no external spell checking library is available, novelWriter falls
-back to using the internal ``difflib`` of Python to check spelling. This is a slower and less
-sophisticated spell checker than the full spell checking libaries. The spell check library must be
-at least 3.0 to work with Windows. On Linux, 2.0 also works fine.
-
-If you install from PyPi, these dependencies should be installed automatically. If you install from
-source, dependencies can still be installed from PyPi with:
-
-.. code-block:: console
-
-   pip install -r requirements.txt
+These zip files don't include any dependencies, so you must install them separately.
 
 
-.. _a_started_install:
+.. _a_started_minimal_windows:
 
-Installing via PyPi
-===================
+Windows
+-------
 
-The application is written in Python 3 using Qt5 via PyQt5. It is developed on Linux, but it should
-in principle work fine on other operating systems as long as dependencies are met.
+First, make sure you have Python installed on your system. If you don't, you can download it from
+`python.org`_. Python 3.7 or higher is required, but it is recommended that you install the latest
+version.
 
-You can download the latest version of novelWriter from the source repository on GitHub_.
-novelWriter is also hosted on PyPi_, and can be installed on all operating systems that support Qt5
-and Python 3. It is regularly tested on Linux, Windows and macOS. The latest version of novelWriter
-is |release|.
+Make sure you select the "Add Python to PATH" option during installation, otherwise the ``python``
+command will not work in the command line window.
+
+.. figure:: images/python_win_install.png
+   :align: center
+   :width: 500
+
+When Python is installed, extract the novelWriter zip file and move the extracted folder to a
+suitable location. You should probably not keep it on your desktop or in your downloads folder
+where it may be accidentally deleted. Instead, move and rename it to for instance
+``C:\novelWriter``.
+
+After you've got the folder where you want it, open it and double-click the file named
+``windows_install.bat``. This will open a command line window and run the setup script to install
+dependencies, and add desktop and start menu icons.
+
+Running ``windows_uninstall.bat`` will reverse the process if you wish to uninstall. After that,
+you can just delete the novelWriter folder.
+
+
+.. _a_started_minimal_linux:
+
+Linux
+-----
+
+On Linux you need to install the following packages on Debian-based distros, including Ubuntu and
+Linux Mint:
+
+.. code-block:: bash
+
+   sudo apt install python3-pyqt5 python3-lxml python3-enchant
+
+On Fedora, you need the following packages:
+
+.. code-block:: bash
+
+   sudo dnf install python3-qt5 python3-lxml python3-enchant
+
+A standard desktop launcher can be installed via the main setup script. It will create the needed
+desktop file and add it to the Applications menu. The necessary icons will also be installed, and a
+file association with ``.nwx`` files added.
+
+To set this up, run the following from inside the extracted novelWriter folder:
+
+.. code-block:: bash
+
+   python3 setup.py xdg-install
+
+This installs icons for the current user. Run with ``sudo`` to install system-wide.
+
+To uninstall the icons, run:
+
+.. code-block:: bash
+
+   python3 setup.py xdg-uninstall
+
+
+.. _a_started_minimal_mac:
+
+macOS
+-----
+
+These instructions assume you're using brew, and have Python and pip set up. If not, see the
+`brew docs`_ for help. The main requirements for novelWriter are installed via the requirements
+file. You also need to install the ``pyobjc`` package, so you should run:
+
+.. code-block:: bash
+
+   pip3 install --user -r requirements.txt
+   pip3 install --user pyobjc
+
+For spell checking you may also need to install the enchant package. It comes with a lot of default
+dictionaries.
+
+.. code-block:: bash
+
+   brew install enchant
+
+With the dependencies in place, you can launch the ``novelWriter.py`` script directly to run
+novelWriter.
+
+.. note::
+   Right now there isn't a better integration with macOS available. Contributions from someone more
+   familiar with macOS would be very much appreciated. See the macOS_ issue on GitHub.
+
+
+.. _a_started_pip:
+
+Install from PyPi
+=================
+
+novelWriter is also available on the Python Package Index, or PyPi_. This install method works on
+all supported operating systems.
 
 To install from PyPi you must first have the ``python`` and ``pip`` commands available on your
-system. If you don't, see specific instructions for your operating system in this documentation.
+system. If you don't, see specific instructions for your operating system in this documentation on
+how to get the Python environment set up.
+
 To install novelWriter from PyPi, use the following command:
 
-.. code-block:: console
+.. code-block:: bash
 
    pip install novelwriter
 
 To upgrade an existing installation, use:
 
-.. code-block:: console
+.. code-block:: bash
 
    pip install --upgrade novelwriter
 
 When installing via pip, novelWriter can be launched from command line with:
 
-.. code-block:: console
+.. code-block:: bash
 
-   novelWriter
+   novelwriter
 
 Make sure the install location for pip is in your PATH variable. This is not always the case by
 default.
 
-
-.. _a_started_i18n:
-
-Building the Translation Files
-==============================
-
-If you installed novelWriter from a package, the translation files should be pre-built and
-included. If you're running novelWriter from the source code, you will need to generate the files
-yourself. The files you need will be written to the ``nw/assets/i18n`` folder, and will have the
-``.qm`` file extension.
-
-You can build the ``.qm`` files with:
-
-.. code-block:: console
-
-   python3 setup.py qtlrelease
-
-This requires that the Qt Linguist tool is installed on your system. On Ubuntu and Debian, the
-needed package is called `qttools5-dev-tools`.
-
 .. note::
-   If you want to improve novelWriter with translation files for another language, or update an
-   existing translation, instructions for how to contribute can be found in the README file in the
-   ``i18n`` folder of the source code.
-
-
-.. _a_started_docs:
-
-Building the Documentation
-==========================
-
-If you installed novelWriter from a package, the documentation should be bre-built and included. If
-you're running novelWriter from the source code, a local copy of this documentation can be
-generated. It requires the following Python packages on Debian and Ubuntu.
-
-* ``python3-sphinx``
-* ``python3-sphinx-rtd-theme``
-* ``python3-sphinxcontrib.qthelp``
-
-Or from PyPi:
-
-.. code-block:: console
-
-   pip install sphinx sphinx-rtd-theme sphinxcontrib-qthelp
-
-The documentation can then be built from the ``docs`` folder in the source code by running:
-
-.. code-block:: console
-
-   make html
-
-If successful, the documentation should be available in the ``docs/build/html`` folder and you can
-open the ``index.html`` file in your browser.
-
-The documentation can also be built for the Qt Assistant. To build the help packages from the
-documentation source, run the following from the root source folder:
-
-.. code-block:: console
-
-   python setup.py qthelp
-
-The setup script will copy the generated files into the ``nw/assets/help`` folder, and novelWriter
-will detect the presence of the files and redirect the menu help entry to open help locally instead
-of sending the user to the website. Pressing the :kbd:`F1` key will in any case try to open help
-locally first, then send you to the website as a fallback.
-
-.. note::
-   In order for the local version of help to work, the Qt Assistant must be installed on the local
-   computer. If it isn't available, or novelWriter cannot find it, the help feature will fall back
-   to redirecting you to the documentation website.
+   On systems with both Python 2 and 3, you may have to replace the ``pip`` command with ``pip3``.

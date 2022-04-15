@@ -3,7 +3,7 @@ novelWriter – Main GUI Novel Tree Class Tester
 ==============================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,10 +61,6 @@ def testGuiNovelTree_TreeItems(qtbot, monkeypatch, nwGUI, nwMinimal):
     ##
 
     nwGUI.projTabs.setCurrentIndex(nwGUI.idxNovelView)
-
-    # The tree should be empty as there is no index
-    assert nwTree.topLevelItemCount() == 0
-
     nwGUI.rebuildIndex()
     nwTree._populateTree()
     assert nwTree.topLevelItemCount() == 1
@@ -74,7 +70,7 @@ def testGuiNovelTree_TreeItems(qtbot, monkeypatch, nwGUI, nwMinimal):
     assert not topItem.isSelected()
     topItem.setSelected(True)
     assert nwTree.selectedItems()[0] == topItem
-    assert nwTree.getSelectedHandle() == "a35baf2e93843"
+    assert nwTree.getSelectedHandle() == ("a35baf2e93843", 0)
 
     nwTree.refreshTree()
     assert nwTree.topLevelItem(0).isSelected()

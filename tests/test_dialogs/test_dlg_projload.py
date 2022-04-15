@@ -3,7 +3,7 @@ novelWriter – Project Load Dialog Class Tester
 ==============================================
 
 This file is a part of novelWriter
-Copyright 2018–2021, Veronica Berglyd Olsen
+Copyright 2018–2022, Veronica Berglyd Olsen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import (
     QMessageBox
 )
 
-from nw.dialogs import GuiProjectLoad
+from novelwriter.dialogs import GuiProjectLoad
 
 keyDelay = 2
 typeDelay = 1
